@@ -57,10 +57,10 @@ class RuntimeService:
                 data = file.read()
 
         program_data = to_base64_string(data)
-        response = self._client.program_upload(
+        status_code, response = self._client.program_upload(
             program_data=program_data, **program_metadata
         )
-        status_code = response["status"]
+        # status_code = response["status"]
         if status_code == 409:
             raise DuplicateProgramException(
                 "Program with the same name already exists."
@@ -69,7 +69,11 @@ class RuntimeService:
             raise NotAuthorizedException(
                 "You are not authorized to upload programs."
             ) from None
-        elif response["status"] != 200:
+        elif status_code == 406:
+            raise ArgsException(
+                "You have not provide enough args."
+            ) from None
+        elif status_code != 200:
             raise UploadException(f"Failed to create program: Unkown Error.") from None
         return response["id"]
 

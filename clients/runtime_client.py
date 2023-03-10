@@ -46,7 +46,11 @@ class RuntimeClient:
             "is_public": 1 if is_public is True else 2,
         }
         data = json.dumps(payload)
-        return self._session.post(url, headers=headers, data=data).json()
+        res = self._session.post(url, headers=headers, data=data)
+        if res.status_code == 200:
+            return res.status_code, res.json()
+        else:
+            return res.status_code, None
 
     def program_update(self):
         """
