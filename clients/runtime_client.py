@@ -1,5 +1,5 @@
 import json
-from typing import Optional, Dict
+from typing import Optional
 
 import requests
 
@@ -11,6 +11,7 @@ class RuntimeClient:
     One RuntimeClient represent one session.
     So we can check cookie instead token.
     """
+
     def __init__(self,
                  token: str,
                  url: str
@@ -64,11 +65,28 @@ class RuntimeClient:
         """
         pass
 
-    def program_run(self):
+    def program_run(self,
+                    program_id: str = None,
+                    name: str = None,
+                    backend: str = None,
+                    params: dict = None):
         """
         Run a program on the runtime server.
         """
-        pass
+        url = self.get_url("programs_run")
+        headers = {'Content-Type': 'application/json;charset=UTF-8', 'api_token': self._token}
+        payload = {
+            "program_id": program_id,
+            "program_name": name,
+            "backend": backend,
+            "params": params
+        }
+        data = json.dumps(payload)
+        res = self._session.post(url, headers=headers, data=data)
+        if res.status_code == 200:
+            return res.status_code, res.json()
+        else:
+            return res.status_code, None
 
     def program_get(self):
         """

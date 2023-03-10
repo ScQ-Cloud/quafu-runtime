@@ -40,3 +40,12 @@ class NotAuthorizedException(ClientExceptions):
 
 class UploadException(ClientExceptions):
     """Base class for errors raised by the runtime service modules."""
+
+class ProgramNotFoundException(ClientExceptions):
+    """Exception raised when program id not found."""
+
+class RunFailedException(ClientExceptions):
+    """Exception raised when program run failed."""
+
+class InputValuexception(ClientExceptions):
+    """Exception raised when program input is invalid."""
