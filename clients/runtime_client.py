@@ -110,3 +110,18 @@ class RuntimeClient:
             The resolved URL of the endpoint (relative to the session base URL).
         """
         return "{}{}{}".format(self._url, "/", identifier)
+
+    def job_result(self):
+        pass
+
+    def job_interim_results(self):
+        pass
+
+    def job_cancel(self):
+        pass
+
+    def job_status(self):
+        pass
+
+    def job_logs(self):
+        pass

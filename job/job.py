@@ -19,7 +19,7 @@ class Job:
         self.params = params
         self._client = api_client
         self.backend = backend
-        status_map = {0: "In Queue", 1: "Running", 2: "Completed", "Canceled": 3, 4: "Failed"}
+        status_map = {0: "In Queue", 1: "Running", 2: "Completed", 3: "Canceled", 4: "Failed"}
         self._job_id = job_id
         self._program_id = program_id
         self._creation_date = creation_date
@@ -60,10 +60,19 @@ class Job:
         """
         Return program id.
         """
-        pass
+        return self._program_id
 
     def job_id(self):
         """
         Return job id.
         """
-        pass
+        return self._job_id
+
+    def err_msg(self):
+        """
+        Return job error message.
+        """
+        if self.status == "Failed":
+            return self._error_msg
+        else:
+            return f"The job's status is:{self._status}"

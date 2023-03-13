@@ -120,6 +120,10 @@ class RuntimeService:
             raise InputValuexception(
                 f"Input is invalid:{inputs}"
             )from None
+        elif status_code == 402:
+            raise ProgramNotValidException(
+                f"Input is invalid:{inputs}"
+            )from None
         elif status_code != 200:
             raise RunFailedException(f"Failed to run program: {program_id}") from None
         if backend is None:

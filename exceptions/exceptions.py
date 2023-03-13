@@ -49,3 +49,6 @@ class RunFailedException(ClientExceptions):
 
 class InputValuexception(ClientExceptions):
     """Exception raised when program input is invalid."""
+
+class ProgramNotValidException(ClientExceptions):
+    """Exception raised when program data is invalid."""
