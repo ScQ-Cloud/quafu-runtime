@@ -120,9 +120,9 @@ class RuntimeService:
             raise InputValuexception(
                 f"Input is invalid:{inputs}"
             )from None
-        elif status_code == 402:
+        elif status_code == 405:
             raise ProgramNotValidException(
-                f"Input is invalid:{inputs}"
+                f"Program is invalid:{inputs}"
             )from None
         elif status_code != 200:
             raise RunFailedException(f"Failed to run program: {program_id}") from None
@@ -138,17 +138,6 @@ class RuntimeService:
             params=inputs,
         )
         return job
-
-
-
-        pass
-
-    def job(self) -> Job:
-        """
-        TODO:
-            get the runtime jobs or a job by job id.
-        """
-        pass
 
     def _read_metadata(self, metadata:  str = None) -> Dict:
         """Read metadata.
