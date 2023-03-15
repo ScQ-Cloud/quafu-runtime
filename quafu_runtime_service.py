@@ -132,8 +132,8 @@ class RuntimeService:
             status=response["status"],
             backend=backend,
             api_client=self._client,
-            job_id=response["id"],
-            creation_date=response["creation_date"],
+            job_id=response["job_id"],
+            creation_date=response["creation_time"],
             program_id=program_id,
             params=inputs,
         )

@@ -100,19 +100,25 @@ class RuntimeClient:
         """
         pass
 
-    def get_url(self, identifier: str) -> str:
-        """Return the resolved URL for the specified identifier.
-
-        Args:
-            identifier: Internal identifier of the endpoint.
-
-        Returns:
-            The resolved URL of the endpoint (relative to the session base URL).
+    def job_result(self,
+                   job_id: str):
         """
-        return "{}{}{}".format(self._url, "/", identifier)
+        Try to get result.
 
-    def job_result(self):
-        pass
+        TODO:
+            USE WEBSOCKET.
+        """
+        url = self.get_url("get_result")
+        headers = {'Content-Type': 'application/json;charset=UTF-8', 'api_token': self._token}
+        payload = {
+            "job_id": job_id,
+        }
+        data = json.dumps(payload)
+        res = self._session.post(url, headers=headers, data=data)
+        if res.status_code == 200:
+            return res.status_code, res.json()
+        else:
+            return res.status_code, None
 
     def job_interim_results(self):
         pass
@@ -125,3 +131,14 @@ class RuntimeClient:
 
     def job_logs(self):
         pass
+
+    def get_url(self, identifier: str) -> str:
+        """Return the resolved URL for the specified identifier.
+
+        Args:
+            identifier: Internal identifier of the endpoint.
+
+        Returns:
+            The resolved URL of the endpoint (relative to the session base URL).
+        """
+        return "{}{}{}".format(self._url, "/", identifier)

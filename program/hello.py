@@ -20,4 +20,7 @@ def run(args):
     q = prepare_circuits()
     simu_res = simulate(q)
     print("Hello World!",args[0])
-    return simu_res
+    return {
+        "num": simu_res.num,
+        "probabilities": simu_res.probabilities.tolist(),
+    }
