@@ -29,7 +29,7 @@ class Job:
 
     def result(self):
         """
-        Get the result from server.
+        Get the result from server. It will wait until job stop.
         """
         if self._job_id is None:
             raise ArgsException("one of program_id and name is needed.")

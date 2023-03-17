@@ -108,7 +108,7 @@ class RuntimeClient:
         TODO:
             USE WEBSOCKET.
         """
-        url = self.get_url("get_result")
+        url = self.get_url("get_result_nowait")
         headers = {'Content-Type': 'application/json;charset=UTF-8', 'api_token': self._token}
         payload = {
             "job_id": job_id,

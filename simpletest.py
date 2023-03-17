@@ -34,4 +34,4 @@ class TestAPI():
 
 if __name__ == '__main__':
     print(os.getcwd())
-    TestAPI.TestJob()
+    TestAPI.TestUpload()

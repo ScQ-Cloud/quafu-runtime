@@ -15,11 +15,11 @@ def prepare_circuits():
     q.measure(measures,  cbits=cbits)
     return q
 
-def run(args):
+def run(backend,args):
     """The entry point of the program."""
     q = prepare_circuits()
     simu_res = simulate(q)
-    print("Hello World!",args[0])
+    print("Hello World!", args)
     return {
         "num": simu_res.num,
         "probabilities": simu_res.probabilities.tolist(),
