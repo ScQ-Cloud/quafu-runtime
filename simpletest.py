@@ -18,14 +18,14 @@ class TestAPI():
     def TestRun():
         account = Account("testapitoken")
         service = RuntimeService(account)
-        job = service.run(program_id="c79bf9e77bd3471799d93090543cb8ed", backend="py_simu", inputs="zsl")
+        job = service.run(program_id="784376be3f8b40309be7e1e9ab7c7404", backend="py_simu", inputs="zsl")
         print(job.job_id())
 
     @staticmethod
     def TestJob():
         account = Account("testapitoken")
         service = RuntimeService(account)
-        job = service.run(program_id="c79bf9e77bd3471799d93090543cb8ed", backend="py_simu", inputs="zxxx")
+        job = service.run(program_id="784376be3f8b40309be7e1e9ab7c7404", backend="py_simu", inputs="zxxx")
         print(job.job_id())
         print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         sleep(5)
@@ -34,4 +34,4 @@ class TestAPI():
 
 if __name__ == '__main__':
     print(os.getcwd())
-    TestAPI.TestUpload()
+    TestAPI.TestRun()

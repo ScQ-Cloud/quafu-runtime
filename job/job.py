@@ -27,27 +27,31 @@ class Job:
         self._status = status_map[status]
         self._error_msg = None
 
-    def result(self):
+    def result(self,
+               wait: bool):
         """
         Get the result from server. It will wait until job stop.
         """
         if self._job_id is None:
-            raise ArgsException("one of program_id and name is needed.")
+            raise ArgsException("job_id is needed.")
         job_id = self.job_id()
-        status_code, response = self._client.job_result(
-            job_id=job_id
-        )
-        if status_code == 404:
-            raise JobNotFoundException(
-                f"Job not found: {job_id}"
-            ) from None
-        elif status_code == 405:
-            raise NotAuthorizedException(
-                f"You are not the owner of Job:{job_id}"
-            )from None
-        elif status_code != 200:
-            raise RunFailedException(f"Failed to get result: {job_id}") from None
-        return response
+        if wait:
+            self._client.job_result_wait(job_id)
+        else:
+            status_code, response = self._client.job_result_nowait(
+                job_id=job_id
+            )
+            if status_code == 404:
+                raise JobNotFoundException(
+                    f"Job not found: {job_id}"
+                ) from None
+            elif status_code == 405:
+                raise NotAuthorizedException(
+                    f"You are not the owner of Job:{job_id}"
+                )from None
+            elif status_code != 200:
+                raise RunFailedException(f"Failed to get result: {job_id}") from None
+            return response
 
     def interim_results(self):
         """
@@ -59,6 +63,20 @@ class Job:
         """
         Cancel the job.
         """
+        if self._job_id is None:
+            raise ArgsException("job_id is needed.")
+        status_code, response = self._client.job_cancel(job_id=job_id)
+        if status_code == 404:
+            raise JobNotFoundException(
+                f"Job not found: {job_id}"
+            ) from None
+        elif status_code == 405:
+            raise NotAuthorizedException(
+                f"You are not the owner of Job:{job_id}"
+            )from None
+        elif status_code != 200:
+            raise RunFailedException(f"Failed to cancel job: {job_id}") from None
+        return response
         pass
 
     def status(self):
