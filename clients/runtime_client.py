@@ -20,7 +20,7 @@ class RuntimeClient:
                  ):
         self._token = token
         self._url = url + "/runtime"
-        self._socket_url = '192.168.229.55:8765'
+        self._socket_url = 'ws://192.168.220.55:8765'
         self._session = requests.session()
         self.headers = {'Content-Type': 'application/json;charset=UTF-8', 'api_token': self._token}
 
@@ -76,7 +76,7 @@ class RuntimeClient:
         """
         Run a program on the runtime server.
         """
-        url = self.get_url("programs_run")
+        url = self.get_url("programs_run_deploy")
         payload = {
             "program_id": program_id,
             "program_name": name,
@@ -130,7 +130,8 @@ class RuntimeClient:
         while flag:
             try:
                 # Connect to the WebSocket server
-                async with websockets.connect(url) as websocket:
+                print('Connecting to ', url)
+                async with websockets.connect('ws://192.168.220.55:8765') as websocket:
                     print("try to get result...")
                     message = {'type': 'result', 'job_id': job_id, 'api_token': self._token}
                     await websocket.send(json.dumps(message))
@@ -153,6 +154,7 @@ class RuntimeClient:
                             flag = False
                             break
                         elif type_ == 'wait':
+                            status = mess['status']
                             code = 'in queue' if status == 0 else 'running'
                             print(f'Job has not finished, status: {code}, waiting...')
 

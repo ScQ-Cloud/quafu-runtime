@@ -22,16 +22,26 @@ class TestAPI():
         print(job.job_id())
 
     @staticmethod
-    def TestJob():
+    def TestJob_nowait():
         account = Account("testapitoken")
         service = RuntimeService(account)
         job = service.run(program_id="784376be3f8b40309be7e1e9ab7c7404", backend="py_simu", inputs="zxxx")
         print(job.job_id())
         print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        sleep(5)
+        # sleep(5)
         response = job.result()
         print(response)
 
+    @staticmethod
+    def TestJob_wait():
+        account = Account("testapitoken")
+        service = RuntimeService(account)
+        job = service.run(program_id="784376be3f8b40309be7e1e9ab7c7404", backend="py_simu", inputs="zxxx")
+        print(job.job_id())
+        print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        job.result(wait=True)
+
 if __name__ == '__main__':
     print(os.getcwd())
-    TestAPI.TestRun()
+    TestAPI.TestJob_wait()
+    # TestAPI.TestJob_wait()
