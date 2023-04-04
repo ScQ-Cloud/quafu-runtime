@@ -13,17 +13,96 @@ class RuntimeService:
         self._url = account.get_url()
         self._token = account.get_token()
         self._client = RuntimeClient(self._token, self._url)
-    def programs(self):
+        self._programs = {}
+    def programs(
+            self,
+            refresh: bool = False,
+            limit: int = 10,
+            skip: int = 0):
         """
-        Return available programs on server. Just return metadata.
-        """
-        pass
+        Return available programs on server.
 
-    def program(self):
+        Just return metadata.
+
+        Args:
+            refresh: If ``True``, re-query the server for the programs. Or return the cached value.
+            limit: The number of programs returned at a time. ``None`` means no limit.
+            skip: The number of programs to skip.
+
+        Returns:
+            A list of runtime programs.
         """
-        Return a program.
+        # Need to fetch
+        if not self._programs or refresh:
+            fetch_page_limit = 10
+            offset = 0
+            while True:
+                status, response = self._client.list_programs(
+                    limit=fetch_page_limit, skip=offset
+                )
+                if status == 403:
+                    raise NotAuthorizedException(
+                        "You are not authorized to get programs."
+                    ) from None
+                elif status == 405:
+                    raise ArgsException(
+                        "Your args limit or offset is wrong or not provided."
+                    ) from None
+                elif status != 200:
+                    raise UploadException(f"Failed to fetch programs: Unkown Error.") from None
+
+                program_page = response.get("programs", [])
+                # count is the total number of programs that would be returned if
+                # there was no limit or skip
+                count = response.get("count", 0)
+                if limit is None:
+                    limit = count
+                for prog_dict in program_page:
+                    program_id = prog_dict['program_id']
+                    self._programs[program_id] = prog_dict
+                if len(self._programs) == count or len(self._programs) >= limit + skip or len(program_page) < limit:
+                    # Stop if there are no more programs returned by the server or
+                    # if the number of cached programs is greater than the sum of limit and skip or
+                    # if the server has no more page
+                    break
+                offset += len(program_page)
+        if limit is None:
+            limit = len(self._programs)
+        if skip >= len(self._programs):
+            print("SKIP IS OUT OF RANGE")
+            return None
+        if limit + skip > len(self._programs):
+            return list(self._programs.values())[skip:]
+        return list(self._programs.values())[skip: limit + skip]
+
+
+
+    def program(self,
+                name: str = None,
+                program_id: str = None):
         """
-        pass
+        Return a program by id or name.
+        """
+        if name is None and program_id is None:
+            raise ArgsException(f"name or program_id is a required field.")
+        status, response = self._client.program_get(
+            program_id=program_id, name=name
+        )
+        if status == 403:
+            raise NotAuthorizedException(
+                "You are not authorized to get program."
+            ) from None
+        elif status == 404:
+            raise ProgramNotFoundException(
+                f"Program not found: program_id:{program_id}, name:{name}"
+            ) from None
+        elif status == 405:
+            raise ArgsException(
+                "Your args program_id or name is wrong or not provided."
+            ) from None
+        elif status != 200:
+            raise UploadException(f"Failed to fetch program: Unkown Error.") from None
+        return response
 
     def backends(self):
         """
@@ -52,7 +131,7 @@ class RuntimeService:
         if "backend" not in program_metadata or not program_metadata["name"]:
             raise ArgsException(f"backend is a required metadata field.")
 
-        if "def main(" not in data:
+        if "def run(" not in data:
             # This is the program file
             with open(data, "r", encoding="utf-8") as file:
                 data = file.read()
@@ -118,7 +197,7 @@ class RuntimeService:
             ) from None
         elif status_code == 401:
             raise InputValuexception(
-                f"Input is invalid:{inputs}"
+                f"params of run is invalid:{inputs}"
             )from None
         elif status_code == 405:
             raise ProgramNotValidException(

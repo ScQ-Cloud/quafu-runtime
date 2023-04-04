@@ -90,11 +90,37 @@ class RuntimeClient:
         else:
             return res.status_code, None
 
-    def program_get(self):
+    def list_programs(self, limit: int = 0, skip: int = 0):
+        """
+        Return a list of runtime programs.
+        """
+        url = self.get_url("programs")
+        payload = {
+            "limit": limit,
+            "offset": skip
+        }
+        res = self._session.get(url, headers=self.headers, params=payload)
+        if res.status_code == 200:
+            return res.status_code, res.json()
+        else:
+            return res.status_code, None
+
+    def program_get(self,
+                    program_id: str = None,
+                    name: str = None):
         """
         Get an existed program.
         """
-        pass
+        url = self.get_url("program")
+        payload = {
+            "program_id": program_id,
+            "name": name
+        }
+        res = self._session.get(url, headers=self.headers, params=payload)
+        if res.status_code == 200:
+            return res.status_code, res.json()
+        else:
+            return res.status_code, None
 
     def program_validate(self):
         """
@@ -136,6 +162,9 @@ class RuntimeClient:
                     message = {'type': 'result', 'job_id': job_id, 'api_token': self._token}
                     await websocket.send(json.dumps(message))
                     # Process incoming messages
+                    result = None
+                    status = -1
+                    finish_time = None
                     async for message in websocket:
                         mess = json.loads(message)
                         type_ = mess['type']
@@ -157,16 +186,19 @@ class RuntimeClient:
                             status = mess['status']
                             code = 'in queue' if status == 0 else 'running'
                             print(f'Job has not finished, status: {code}, waiting...')
+                    # Return result!
+                    if flag is False:
+                        return status, finish_time, result
 
             except websockets.WebSocketException as e:
                 # An error has occurred; schedule a restart
-                print("Connect to server Error: ", e)
-                print("Trying reconnect...")
+                print(f"Connect to server Error:{e},Trying reconnect...")
                 await asyncio.sleep(1)
                 count_retry += 1
                 if retries <= count_retry:
-                    print("Can't connect to server.")
+                    print("Failed connect to server.")
                     break
+        return -1, None, None
 
     def job_result_wait(self,
                         job_id: str):
@@ -174,7 +206,7 @@ class RuntimeClient:
         Wait until job done. Implemented by websockets.
         """
         url = self.get_url("get_result_wait")
-        asyncio.get_event_loop().run_until_complete(self.get_result(url, job_id))
+        return asyncio.get_event_loop().run_until_complete(self.get_result(url, job_id))
 
     def job_interim_results(self):
         pass

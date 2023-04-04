@@ -56,4 +56,5 @@ def TestJob_wait():
 if __name__ == '__main__':
     print(os.getcwd())
     # TestAPI.TestJob_wait()
+    # TestAPI.TestJob_nowait()
     TestAPI.parallelTest(num=5)

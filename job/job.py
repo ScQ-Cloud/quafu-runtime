@@ -20,13 +20,14 @@ class Job:
         self.params = params
         self._client = api_client
         self.backend = backend
-        status_map = {0: "In Queue", 1: "Running", 2: "Completed", 3: "Canceled", 4: "Failed"}
+        self._status_map = {0: "In Queue", 1: "Running", 2: "Completed", 3: "Canceled", 4: "Failed"}
         self._job_id = job_id
         self._program_id = program_id
         self._creation_date = creation_date
-        self._status = status_map[status]
+        self._status = self._status_map[status]
         self._error_msg = None
-
+        self._result = None
+        self._finish_time = None
     def result(self,
                wait: bool):
         """
@@ -36,7 +37,11 @@ class Job:
             raise ArgsException("job_id is needed.")
         job_id = self.job_id()
         if wait:
-            self._client.job_result_wait(job_id)
+            status, finish_time, result = self._client.job_result_wait(job_id)
+            if status != -1:
+                self._status = self._status_map[status]
+                self._finish_time = finish_time
+                self._result = result
         else:
             status_code, response = self._client.job_result_nowait(
                 job_id=job_id
@@ -51,6 +56,7 @@ class Job:
                 )from None
             elif status_code != 200:
                 raise RunFailedException(f"Failed to get result: {job_id}") from None
+            # self._result = response[]
             return response
 
     def interim_results(self):
