@@ -56,17 +56,52 @@ class RuntimeClient:
         else:
             return res.status_code, None
 
-    def program_update(self):
+    def program_update(
+            self,
+            program_id: str,
+            program_data: str = None,
+            name: str = None,
+            description: str = None,
+            max_execution_time: int = None,
+            is_public: bool = None,
+            backend: str = None,
+            group: str = None
+    ):
         """
         Update an existed program.
         """
-        pass
+        # update data
+        payload = {"program_id": program_id}
+        url = self.get_url("program_update")
+        if program_data:
+            payload["data"] = program_data
+        # update metadata
+        if any([name, description, max_execution_time, is_public, backend, group]):
+            if name:
+                payload["name"] = name
+            if description:
+                payload["description"] = description
+            if max_execution_time:
+                payload["cost"] = max_execution_time
+            if is_public:
+                payload["is_public"] = 1 if is_public is True else 2,
+            if group:
+                payload["group"] = group
+            if backend:
+                payload["backend"] = backend
+        res = self._session.post(url, data=json.dumps(payload), header=self.headers)
+        if res.status_code == 200:
+            return res.status_code, res.json()
+        else:
+            return res.status_code, None
 
-    def program_delete(self):
+    def program_delete(self, program_id: str):
         """
         Delete an existed program.
         """
-        pass
+        url = self.get_url("program_delete")
+        res = self._session.delete(url, headers=self.headers, params={'program_id': program_id})
+        return res.status_code
 
     def program_run(self,
                     program_id: str = None,
@@ -90,7 +125,7 @@ class RuntimeClient:
         else:
             return res.status_code, None
 
-    def list_programs(self, limit: int = 0, skip: int = 0):
+    def get_programs(self, limit: int = 0, skip: int = 0):
         """
         Return a list of runtime programs.
         """
