@@ -48,7 +48,7 @@ class TestAPI():
 def TestJob_wait():
     account = Account("testapitoken")
     service = RuntimeService(account)
-    job = service.run(program_id="784376be3f8b40309be7e1e9ab7c7404", backend="py_simu", inputs="zxxx")
+    job = service.run(program_id="409c55020cda4eedbae341fe316c1970", backend="py_simu", inputs="zxxx")
     print(job.job_id())
     print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     job.result(wait=True)
