@@ -1,5 +1,5 @@
 from clients.runtime_client import RuntimeClient
-from exceptions.exceptions import ArgsException, JobNotFoundException, NotAuthorizedException, RunFailedException
+from rtexceptions.rtexceptions import ArgsException, JobNotFoundException, NotAuthorizedException, RunFailedException
 
 
 class Job:
@@ -71,6 +71,7 @@ class Job:
         """
         if self._job_id is None:
             raise ArgsException("job_id is needed.")
+        job_id = self.job_id()
         status_code, response = self._client.job_cancel(job_id=job_id)
         if status_code == 404:
             raise JobNotFoundException(
@@ -83,7 +84,6 @@ class Job:
         elif status_code != 200:
             raise RunFailedException(f"Failed to cancel job: {job_id}") from None
         return response
-        pass
 
     def status(self):
         """
@@ -95,7 +95,21 @@ class Job:
         """
         Return job logs.
         """
-        pass
+        if self._job_id is None:
+            raise ArgsException("job_id is needed.")
+        job_id = self.job_id()
+        status_code, response = self._client.job_logs(job_id=job_id)
+        if status_code == 404:
+            raise JobNotFoundException(
+                f"Job not found: {job_id}"
+            ) from None
+        elif status_code == 405:
+            raise NotAuthorizedException(
+                f"You are not the owner of Job:{job_id}"
+            )from None
+        elif status_code != 200:
+            raise RunFailedException(f"Failed to cancel job: {job_id}") from None
+        return response
 
     def program_id(self):
         """

@@ -7,7 +7,7 @@ from job.job import Job
 from quafu_runtime_service import RuntimeService
 
 
-class TestAPI():
+class TestAPI:
     @staticmethod
     def TestUpload():
         account = Account("testapitoken")
@@ -15,12 +15,13 @@ class TestAPI():
         metadata = {"name": "testname1", "backend": "testbackend"}
         program_id = service.upload_program(data='program/hello.py', metadata=metadata)
         print(program_id)
+
     @staticmethod
     def TestUploadMore(num: int):
         account = Account("testapitoken")
         service = RuntimeService(account)
         for i in range(num):
-            metadata = {"name": "testname"+str(i+10), "backend": "testbackend"}
+            metadata = {"name": "testname" + str(i + 10), "backend": "testbackend"}
             program_id = service.upload_program(data='program/hello.py', metadata=metadata)
             print(program_id)
 
@@ -28,7 +29,24 @@ class TestAPI():
     def TestGetPrograms():
         account = Account("testapitoken")
         service = RuntimeService(account)
-        service.list_programs(refresh=True, detailed=True, limit=20)
+        service.list_programs(refresh=True, detailed=False, limit=20)
+        service.program()
+
+    @staticmethod
+    def TestUpdateProgram():
+        account = Account("testapitoken")
+        service = RuntimeService(account)
+        service.update_program(program_id='1304493a31d34e4d8e73e3164d0cb8ed',
+                               data='program/hello2.py',
+                               description='The program is created by QuaFu')
+        # service.program()
+
+    @staticmethod
+    def TestDelProgram():
+        account = Account("testapitoken")
+        service = RuntimeService(account)
+        service.delete_program(program_id='f08e063a0e7b42c48815cb5004fac7f2')
+        # service.program()
 
     @staticmethod
     def TestRun():
@@ -82,4 +100,6 @@ if __name__ == '__main__':
     # TestAPI.TestJob_wait()
     # TestAPI.TestJob_nowait()
     # TestAPI.parallelTest(num=5)
-    TestAPI.TestGetPrograms()
+    # TestAPI.TestGetPrograms()
+    # TestAPI.TestUpdateProgram()
+    # TestAPI.TestDelProgram()

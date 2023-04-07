@@ -76,9 +76,7 @@ class RuntimeClient:
         if program_data:
             payload["data"] = program_data
         # update metadata
-        if any([name, description, max_execution_time, is_public, backend, group]):
-            if name:
-                payload["name"] = name
+        if any([description, max_execution_time, is_public, backend, group]):
             if description:
                 payload["description"] = description
             if max_execution_time:
@@ -89,7 +87,9 @@ class RuntimeClient:
                 payload["group"] = group
             if backend:
                 payload["backend"] = backend
-        res = self._session.post(url, data=json.dumps(payload), header=self.headers)
+        # print('program_id:', payload['program_id'])
+        data = json.dumps(payload)
+        res = self._session.post(url, headers=self.headers, data=data)
         if res.status_code == 200:
             return res.status_code, res.json()
         else:

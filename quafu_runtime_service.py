@@ -1,8 +1,8 @@
 import warnings
 
-from utils.jsonutil import to_base64_string
+from utils.jsonutil import to_base64_string, from_base64_string
 from typing import Union, Dict, Any
-from exceptions.exceptions import *
+from rtexceptions.rtexceptions import *
 from clients.account import Account
 from clients.runtime_client import RuntimeClient
 from job.job import Job
@@ -44,10 +44,10 @@ class RuntimeService:
                 print(str(prog))
             else:
                 print(
-                    f"{prog['program_id']}:",
+                    f"program_id:{prog['program_id']}",
                 )
-                print(f"  Name: {prog['name']}")
-                print(f"  Description: {prog['description']}")
+                print(f" -Name: {prog['name']}")
+                print(f" -Description: {prog['description']}")
 
     def programs(
             self,
@@ -108,11 +108,20 @@ class RuntimeService:
         return list(self._programs.values())[skip: limit + skip]
 
     def program(self,
+                refresh: bool = False,
                 name: str = None,
                 program_id: str = None):
         """
         Return a program by id or name.
+
+        Args:
+            refresh: if refresh is true or never fetch the program, get it from server.
         """
+        # return result from cache
+        if refresh is False:
+            if program_id in self._programs and 'data' in self._programs[program_id]:
+                return self._programs[program_id]
+
         if name is None and program_id is None:
             raise ArgsException(f"name or program_id is a required field.")
         status, response = self._client.program_get(
@@ -132,6 +141,10 @@ class RuntimeService:
             ) from None
         elif status != 200:
             raise UploadException(f"Failed to fetch program: Unkown Error.") from None
+        response['data'] = from_base64_string(response['data']).decode("utf-8")
+        if self._programs is None:
+            self._programs = {}
+        self._programs[program_id] = response
         return response
 
     # def backends(self):
@@ -186,13 +199,13 @@ class RuntimeService:
             ) from None
         elif status_code != 200:
             raise UploadException(f"Failed to create program: Unkown Error.") from None
+
         return response["id"]
 
     def update_program(
             self,
             program_id: str,
             data: str = None,
-            name: str = None,
             description: str = None,
             max_execution_time: int = None,
             is_public: bool = None,
@@ -203,21 +216,20 @@ class RuntimeService:
         """Update a program.
 
             Program metadata can be specified using the `metadata` parameter or
-            individual parameters, such as `name` and `description`. The individual parameter
+            individual parameters, such as `description`. The individual parameter
             takes precedence.
 
             Args:
                 program_id: Program ID.
                 data: Program data or path of the file containing program data to upload.
                 metadata: Name of the program metadata dictionary.
-                name: New program name.
                 description: New program description.
                 max_execution_time: New maximum execution time.
                 is_public: Program set to public or not.
                 backend: Backend to run the circuits of the program.
                 group: Not used. Group the program shared.
         """
-        if not any([data, metadata, name, description, max_execution_time, is_public, backend, group]):
+        if not any([data, metadata, description, max_execution_time, is_public, backend, group]):
             warnings.warn(
                 "None of the 'data', 'metadata', 'name', 'description', "
                 "'max_execution_time', or 'spec' parameters is specified. "
@@ -235,7 +247,6 @@ class RuntimeService:
             metadata = self._read_metadata(metadata=metadata)
         combined_metadata = self._merge_metadata(
             metadata=metadata,
-            name=name,
             description=description,
             max_execution_time=max_execution_time,
             backend=backend,
@@ -251,7 +262,7 @@ class RuntimeService:
             return
         # update it
         status_code, response = self._client.program_update(
-            program_id, program_data=data, **combined_metadata
+            program_id=program_id, program_data=data, **combined_metadata
         )
         if status_code == 403:
             raise NotAuthorizedException(
@@ -263,7 +274,8 @@ class RuntimeService:
             )from None
         elif status_code != 200:
             raise UpdateException(f"Failed to update program: Unkown Error.") from None
-        print(response)
+        response['data'] = from_base64_string(response['data']).decode("utf-8")
+        print("After update, the program is:\n", response)
         if self._programs is None:
             self._programs = {}
         self._programs[program_id] = response
@@ -275,7 +287,6 @@ class RuntimeService:
             Args:
                 program_id: Program ID.
         """
-
         status_code = self._client.program_delete(program_id=program_id)
         if status_code == 403:
             raise NotAuthorizedException(
