@@ -52,18 +52,18 @@ class TestAPI:
     def TestRun():
         account = Account("testapitoken")
         service = RuntimeService(account)
-        job = service.run(program_id="784376be3f8b40309be7e1e9ab7c7404", backend="py_simu", inputs="zsl")
+        job = service.run(program_id="168bce332e8144d686def23145db1651", backend="py_simu", inputs="zsl")
         print(job.job_id())
 
     @staticmethod
     def TestJob_nowait():
         account = Account("testapitoken")
         service = RuntimeService(account)
-        job = service.run(program_id="784376be3f8b40309be7e1e9ab7c7404", backend="py_simu", inputs="zxxx")
+        job = service.run(program_id="168bce332e8144d686def23145db1651", backend="py_simu", inputs="zxxx")
         print(job.job_id())
         print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        # sleep(5)
-        response = job.result()
+        sleep(5)
+        response = job.result(wait=False)
         print(response)
 
     @staticmethod
@@ -82,7 +82,7 @@ class TestAPI:
 def TestJob_wait():
     account = Account("testapitoken")
     service = RuntimeService(account)
-    job = service.run(program_id="784376be3f8b40309be7e1e9ab7c7404", backend="py_simu", inputs="zxxx")
+    job = service.run(program_id="168bce332e8144d686def23145db1651", backend="py_simu", inputs="zxxx")
     print(job.job_id())
     print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     job.result(wait=True)
@@ -94,11 +94,11 @@ def test_args(name: str = None):
     else:
         print("None")
 
-
 if __name__ == '__main__':
     print(os.getcwd())
+    # TestAPI.TestRun()
     # TestAPI.TestJob_wait()
-    # TestAPI.TestJob_nowait()
+    TestAPI.TestJob_nowait()
     # TestAPI.parallelTest(num=5)
     # TestAPI.TestGetPrograms()
     # TestAPI.TestUpdateProgram()

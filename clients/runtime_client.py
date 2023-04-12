@@ -259,10 +259,37 @@ class RuntimeClient:
             return res.status_code, None
 
     def job_status(self):
-        pass
+        url = self.get_url("job_status")
+        payload = {
+            "job_id": job_id,
+        }
+        res = self._session.get(url, headers=self.headers, params=payload)
+        if res.status_code == 200:
+            return res.status_code, res.json()
+        else:
+            return res.status_code, None
 
-    def job_logs(self):
-        pass
+    def job_logs(self, job_id):
+        url = self.get_url("job_logs")
+        payload = {
+            "job_id": job_id,
+        }
+        res = self._session.get(url, headers=self.headers, params=payload)
+        if res.status_code == 200:
+            return res.status_code, res.json()
+        else:
+            return res.status_code, None
+
+    def job_delete(self, job_id):
+        url = self.get_url("job_delete")
+        payload = {
+            "job_id": job_id,
+        }
+        res = self._session.get(url, headers=self.headers, params=payload)
+        if res.status_code == 200:
+            return res.status_code, res.json()
+        else:
+            return res.status_code, None
 
     def get_url(self, identifier: str) -> str:
         """Return the resolved URL for the specified identifier.

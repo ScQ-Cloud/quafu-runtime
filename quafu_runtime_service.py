@@ -327,7 +327,11 @@ class RuntimeService:
             backend=backend,
             params=inputs,
         )
-        if status_code == 404:
+        if status_code == 403:
+            raise NotAuthorizedException(
+                "You are not authorized to update programs."
+            ) from None
+        elif status_code == 404:
             raise ProgramNotFoundException(
                 f"Program not found: {program_id}"
             ) from None
