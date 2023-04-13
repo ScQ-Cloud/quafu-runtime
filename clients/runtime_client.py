@@ -56,17 +56,52 @@ class RuntimeClient:
         else:
             return res.status_code, None
 
-    def program_update(self):
+    def program_update(
+            self,
+            program_id: str,
+            program_data: str = None,
+            name: str = None,
+            description: str = None,
+            max_execution_time: int = None,
+            is_public: bool = None,
+            backend: str = None,
+            group: str = None
+    ):
         """
         Update an existed program.
         """
-        pass
+        # update data
+        payload = {"program_id": program_id}
+        url = self.get_url("program_update")
+        if program_data:
+            payload["data"] = program_data
+        # update metadata
+        if any([description, max_execution_time, is_public, backend, group]):
+            if description:
+                payload["description"] = description
+            if max_execution_time:
+                payload["cost"] = max_execution_time
+            if is_public:
+                payload["is_public"] = 1 if is_public is True else 2,
+            if group:
+                payload["group"] = group
+            if backend:
+                payload["backend"] = backend
+        # print('program_id:', payload['program_id'])
+        data = json.dumps(payload)
+        res = self._session.post(url, headers=self.headers, data=data)
+        if res.status_code == 200:
+            return res.status_code, res.json()
+        else:
+            return res.status_code, None
 
-    def program_delete(self):
+    def program_delete(self, program_id: str):
         """
         Delete an existed program.
         """
-        pass
+        url = self.get_url("program_delete")
+        res = self._session.delete(url, headers=self.headers, params={'program_id': program_id})
+        return res.status_code
 
     def program_run(self,
                     program_id: str = None,
@@ -90,11 +125,37 @@ class RuntimeClient:
         else:
             return res.status_code, None
 
-    def program_get(self):
+    def get_programs(self, limit: int = 0, skip: int = 0):
+        """
+        Return a list of runtime programs.
+        """
+        url = self.get_url("programs")
+        payload = {
+            "limit": limit,
+            "offset": skip
+        }
+        res = self._session.get(url, headers=self.headers, params=payload)
+        if res.status_code == 200:
+            return res.status_code, res.json()
+        else:
+            return res.status_code, None
+
+    def program_get(self,
+                    program_id: str = None,
+                    name: str = None):
         """
         Get an existed program.
         """
-        pass
+        url = self.get_url("program")
+        payload = {
+            "program_id": program_id,
+            "name": name
+        }
+        res = self._session.get(url, headers=self.headers, params=payload)
+        if res.status_code == 200:
+            return res.status_code, res.json()
+        else:
+            return res.status_code, None
 
     def program_validate(self):
         """
@@ -136,6 +197,9 @@ class RuntimeClient:
                     message = {'type': 'result', 'job_id': job_id, 'api_token': self._token}
                     await websocket.send(json.dumps(message))
                     # Process incoming messages
+                    result = None
+                    status = -1
+                    finish_time = None
                     async for message in websocket:
                         mess = json.loads(message)
                         type_ = mess['type']
@@ -157,16 +221,19 @@ class RuntimeClient:
                             status = mess['status']
                             code = 'in queue' if status == 0 else 'running'
                             print(f'Job has not finished, status: {code}, waiting...')
+                    # Return result!
+                    if flag is False:
+                        return status, finish_time, result
 
             except websockets.WebSocketException as e:
                 # An error has occurred; schedule a restart
-                print("Connect to server Error: ", e)
-                print("Trying reconnect...")
+                print(f"Connect to server Error:{e},Trying reconnect...")
                 await asyncio.sleep(1)
                 count_retry += 1
                 if retries <= count_retry:
-                    print("Can't connect to server.")
+                    print("Failed connect to server.")
                     break
+        return -1, None, None
 
     def job_result_wait(self,
                         job_id: str):
@@ -174,7 +241,7 @@ class RuntimeClient:
         Wait until job done. Implemented by websockets.
         """
         url = self.get_url("get_result_wait")
-        asyncio.get_event_loop().run_until_complete(self.get_result(url, job_id))
+        return asyncio.get_event_loop().run_until_complete(self.get_result(url, job_id))
 
     def job_interim_results(self):
         pass
@@ -192,10 +259,37 @@ class RuntimeClient:
             return res.status_code, None
 
     def job_status(self):
-        pass
+        url = self.get_url("job_status")
+        payload = {
+            "job_id": job_id,
+        }
+        res = self._session.get(url, headers=self.headers, params=payload)
+        if res.status_code == 200:
+            return res.status_code, res.json()
+        else:
+            return res.status_code, None
 
-    def job_logs(self):
-        pass
+    def job_logs(self, job_id):
+        url = self.get_url("job_logs")
+        payload = {
+            "job_id": job_id,
+        }
+        res = self._session.get(url, headers=self.headers, params=payload)
+        if res.status_code == 200:
+            return res.status_code, res.json()
+        else:
+            return res.status_code, None
+
+    def job_delete(self, job_id):
+        url = self.get_url("job_delete")
+        payload = {
+            "job_id": job_id,
+        }
+        res = self._session.get(url, headers=self.headers, params=payload)
+        if res.status_code == 200:
+            return res.status_code, res.json()
+        else:
+            return res.status_code, None
 
     def get_url(self, identifier: str) -> str:
         """Return the resolved URL for the specified identifier.

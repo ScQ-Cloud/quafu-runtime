@@ -1,6 +1,6 @@
 import os
 
-from exceptions.exceptions import UserException
+from rtexceptions.rtexceptions import UserException
 from utils.base import get_homedir
 
 

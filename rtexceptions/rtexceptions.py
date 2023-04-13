@@ -45,8 +45,10 @@ class NotAuthorizedException(ClientExceptions):
 
 
 class UploadException(ClientExceptions):
-    """Base class for errors raised by the runtime service modules."""
+    """Exception raised when Upload a program failed."""
 
+class UpdateException(ClientExceptions):
+    """Exception raised when Update a program failed."""
 
 class ProgramNotFoundException(ClientExceptions):
     """Exception raised when program id not found."""
@@ -66,5 +68,6 @@ class ProgramNotValidException(ClientExceptions):
 
 class JobNotFoundException(ClientExceptions):
     """Exception raised when job is not found."""
+
 
 

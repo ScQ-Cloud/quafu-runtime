@@ -6,7 +6,8 @@ from clients.account import Account
 from job.job import Job
 from quafu_runtime_service import RuntimeService
 
-class TestAPI():
+
+class TestAPI:
     @staticmethod
     def TestUpload():
         account = Account("testapitoken")
@@ -14,6 +15,39 @@ class TestAPI():
         metadata = {"name": "testname3", "backend": "testbackend"}
         program_id = service.upload_program(data='program/hello.py', metadata=metadata)
         print(program_id)
+
+    @staticmethod
+    def TestUploadMore(num: int):
+        account = Account("testapitoken")
+        service = RuntimeService(account)
+        for i in range(num):
+            metadata = {"name": "testname" + str(i + 10), "backend": "testbackend"}
+            program_id = service.upload_program(data='program/hello.py', metadata=metadata)
+            print(program_id)
+
+    @staticmethod
+    def TestGetPrograms():
+        account = Account("testapitoken")
+        service = RuntimeService(account)
+        service.list_programs(refresh=True, detailed=False, limit=20)
+        service.program()
+
+    @staticmethod
+    def TestUpdateProgram():
+        account = Account("testapitoken")
+        service = RuntimeService(account)
+        service.update_program(program_id='1304493a31d34e4d8e73e3164d0cb8ed',
+                               data='program/hello2.py',
+                               description='The program is created by QuaFu')
+        # service.program()
+
+    @staticmethod
+    def TestDelProgram():
+        account = Account("testapitoken")
+        service = RuntimeService(account)
+        service.delete_program(program_id='f08e063a0e7b42c48815cb5004fac7f2')
+        # service.program()
+
     @staticmethod
     def TestRun():
         account = Account("testapitoken")
@@ -28,10 +62,9 @@ class TestAPI():
         job = service.run(program_id="409c55020cda4eedbae341fe316c1970", backend="py_simu", inputs="zxxx")
         print(job.job_id())
         print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        # sleep(5)
-        response = job.result()
+        sleep(5)
+        response = job.result(wait=False)
         print(response)
-
 
     @staticmethod
     def parallelTest(num):
@@ -45,6 +78,7 @@ class TestAPI():
         for p in plist:
             p.join()
 
+
 def TestJob_wait():
     account = Account("testapitoken")
     service = RuntimeService(account)
@@ -53,8 +87,19 @@ def TestJob_wait():
     print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     job.result(wait=True)
 
+
+def test_args(name: str = None):
+    if name:
+        print("name:", name)
+    else:
+        print("None")
+
 if __name__ == '__main__':
     print(os.getcwd())
+    # TestAPI.TestRun()
     # TestAPI.TestJob_wait()
-    TestAPI.TestRun()
-    #TestAPI.TestUpload()
+    TestAPI.TestJob_nowait()
+    # TestAPI.parallelTest(num=5)
+    # TestAPI.TestGetPrograms()
+    # TestAPI.TestUpdateProgram()
+    # TestAPI.TestDelProgram()

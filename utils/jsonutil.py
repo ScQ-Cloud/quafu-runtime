@@ -18,6 +18,16 @@ def to_base64_string(data: str) -> str:
     """
     return base64.b64encode(data.encode("utf-8")).decode("utf-8")
 
+def from_base64_string(data: str) -> str:
+    """Convert base64 string to string.
+
+    Args:
+        data: base64 string to convert
+
+    Returns:
+        data as string
+    """
+    return base64.b64decode(data)
 
 def _serialize_and_encode(
     data: Any, serializer: Callable, compress: bool = True, **kwargs: Any

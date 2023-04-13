@@ -1,6 +1,9 @@
 import numpy as np
 from quafu import QuantumCircuit
 from quafu import simulate
+"""
+It's program used to check api.
+"""
 def prepare_circuits():
     q = QuantumCircuit(5)
     q.x(0)
