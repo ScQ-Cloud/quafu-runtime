@@ -11,7 +11,7 @@ class TestAPI():
     def TestUpload():
         account = Account("testapitoken")
         service = RuntimeService(account)
-        metadata = {"name": "testname2", "backend": "testbackend"}
+        metadata = {"name": "testname3", "backend": "testbackend"}
         program_id = service.upload_program(data='program/hello.py', metadata=metadata)
         print(program_id)
     @staticmethod
@@ -57,3 +57,4 @@ if __name__ == '__main__':
     print(os.getcwd())
     # TestAPI.TestJob_wait()
     TestAPI.TestRun()
+    #TestAPI.TestUpload()
