@@ -54,6 +54,13 @@ class TestAPI:
         service = RuntimeService(account)
         job = service.run(program_id="409c55020cda4eedbae341fe316c1970", backend="py_simu", inputs="zsl")
         print(job.job_id())
+        return job
+
+    @staticmethod
+    def TestJobCancel(job_id: str):
+        account = Account("testapitoken")
+        service = RuntimeService(account)
+        service.cancel(job_id)
 
     @staticmethod
     def TestJob_nowait():
@@ -98,8 +105,10 @@ if __name__ == '__main__':
     print(os.getcwd())
     # TestAPI.TestRun()
     # TestAPI.TestJob_wait()
-    TestAPI.TestJob_nowait()
+    # TestAPI.TestJob_nowait()
     # TestAPI.parallelTest(num=5)
     # TestAPI.TestGetPrograms()
     # TestAPI.TestUpdateProgram()
     # TestAPI.TestDelProgram()
+    job = TestAPI.TestRun()
+    TestAPI.TestJobCancel(job.job_id())

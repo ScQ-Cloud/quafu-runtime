@@ -1,7 +1,7 @@
 import warnings
 
 from utils.jsonutil import to_base64_string, from_base64_string
-from typing import Union, Dict, Any
+from typing import Optional, Union, Dict, Any
 from rtexceptions.rtexceptions import *
 from clients.account import Account
 from clients.runtime_client import RuntimeClient
@@ -298,6 +298,26 @@ class RuntimeService:
             del self._programs[program_id]
         print(f"Program {program_id} deleted.")
         return
+
+    def cancel(self, job_id: str):
+        """
+        Cancel a job running on the runtime server
+
+        Args:
+            job_id: Runtime job ID
+        """
+        status_code, response = self._client.job_cancel(job_id)
+        if status_code == 403:
+            raise NotAuthorizedException(
+                "You are not authorized to update programs."
+            ) from None
+        elif status_code == 404:
+            raise JobNotFoundException(
+                    f"Job not found: {job_id}."
+            ) from None
+        elif status_code != 200:
+            raise RunFailedException(f"Failed to cancel job: {job_id}") from None
+        print(f"Job {job_id} has been cancelled")
 
     def run(self,
             program_id: str = None,
