@@ -163,6 +163,29 @@ class RuntimeClient:
         """
         pass
 
+    def job_result(self,
+                   job_id: str,
+                   wait: bool=False):
+        """
+        Try to get result.
+
+        TODO:
+            USE WEBSOCKET.
+        """
+        if wait:
+            url = self.get_url("get_result_wait")
+        else:
+            url = self.get_url("get_result_nowait")
+        payload = {
+            "job_id": job_id,
+        }
+        data = json.dumps(payload)
+        res = self._session.post(url, headers=self.headers, data=data)
+        if res.status_code == 200:
+            return res.status_code, res.json()
+        else:
+            return res.status_code, None
+
     def job_result_nowait(self,
                           job_id: str):
         """
@@ -300,6 +323,6 @@ class RuntimeClient:
         Returns:
             The resolved URL of the endpoint (relative to the session base URL).
         """
-        if '_wait' in identifier:
-            return self._socket_url
+        #if '_wait' in identifier:
+        #    return self._socket_url
         return "{}{}{}".format(self._url, "/", identifier)

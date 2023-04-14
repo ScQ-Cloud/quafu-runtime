@@ -92,7 +92,7 @@ def TestJob_wait():
     job = service.run(program_id="409c55020cda4eedbae341fe316c1970", backend="py_simu", inputs="zxxx")
     print(job.job_id())
     print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-    job.result(wait=True)
+    print(job.result(wait=True))
 
 
 def test_args(name: str = None):
@@ -110,5 +110,6 @@ if __name__ == '__main__':
     # TestAPI.TestGetPrograms()
     # TestAPI.TestUpdateProgram()
     # TestAPI.TestDelProgram()
-    job = TestAPI.TestRun()
-    TestAPI.TestJobCancel(job.job_id())
+    #job = TestAPI.TestRun()
+    #TestAPI.TestJobCancel(job.job_id())
+    TestJob_wait()

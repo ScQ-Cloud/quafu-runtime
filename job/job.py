@@ -30,6 +30,46 @@ class Job:
         self._finish_time = None
         self._logs = None
 
+    #def result(self,
+    #           wait: bool):
+    #    """
+    #    Get the result from server. It will wait until job stop.
+    #    """
+    #    if self._job_id is None:
+    #        raise ArgsException("job_id is needed.")
+    #    job_id = self.job_id()
+    #    if self._result is not None:
+    #        return{
+    #            'result': self._result,
+    #            'finished_time': self._finish_time,
+    #            'status': self._status
+    #        }
+    #    if wait:
+    #        status, finish_time, result = self._client.job_result_wait(job_id)
+    #        if status != -1:
+    #            self._status = self._status_map[status]
+    #            self._finish_time = finish_time
+    #            self._result = result
+    #    else:
+    #        status_code, response = self._client.job_result_nowait(
+    #            job_id=job_id
+    #        )
+    #        if status_code == 404:
+    #            raise JobNotFoundException(
+    #                f"Job not found: {job_id}"
+    #            ) from None
+    #        elif status_code == 405:
+    #            raise NotAuthorizedException(
+    #                f"You are not the owner of Job:{job_id}"
+    #            )from None
+    #        elif status_code != 200:
+    #            raise RunFailedException(f"Failed to get result: {job_id}") from None
+    #        # self._result = response[]
+    #        self._result = response['result']
+    #        self._status = self._status_map[response['status']]
+    #        self._finish_time = response['finish_time']
+    #        return response
+
     def result(self,
                wait: bool):
         """
@@ -44,31 +84,25 @@ class Job:
                 'finished_time': self._finish_time,
                 'status': self._status
             }
-        if wait:
-            status, finish_time, result = self._client.job_result_wait(job_id)
-            if status != -1:
-                self._status = self._status_map[status]
-                self._finish_time = finish_time
-                self._result = result
-        else:
-            status_code, response = self._client.job_result_nowait(
-                job_id=job_id
-            )
-            if status_code == 404:
-                raise JobNotFoundException(
-                    f"Job not found: {job_id}"
-                ) from None
-            elif status_code == 405:
-                raise NotAuthorizedException(
-                    f"You are not the owner of Job:{job_id}"
-                )from None
-            elif status_code != 200:
-                raise RunFailedException(f"Failed to get result: {job_id}") from None
-            # self._result = response[]
-            self._result = response['result']
-            self._status = self._status_map[response['status']]
-            self._finish_time = response['finish_time']
-            return response
+        status_code, response = self._client.job_result(
+            job_id=job_id,
+            wait=wait
+        )
+        if status_code == 404:
+            raise JobNotFoundException(
+                f"Job not found: {job_id}"
+            ) from None
+        elif status_code == 405:
+            raise NotAuthorizedException(
+                f"You are not the owner of Job:{job_id}"
+            )from None
+        elif status_code != 200:
+            raise RunFailedException(f"Failed to get result: {job_id}") from None
+        # self._result = response[]
+        self._result = response['result']
+        self._status = self._status_map[response['status']]
+        self._finish_time = response['finish_time']
+        return response
 
     def interim_results(self):
         """
