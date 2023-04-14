@@ -12,9 +12,15 @@ class TestAPI:
     def TestUpload():
         account = Account("testapitoken")
         service = RuntimeService(account)
-        metadata = {"name": "testname3", "backend": "testbackend"}
-        program_id = service.upload_program(data='program/hello.py', metadata=metadata)
-        print(program_id)
+        metadata = {"name": "hello", "backend": "testbackend"}
+        id1 = service.upload_program(data='program/hello.py', metadata=metadata)
+        metadata = {"name": "for-while", "backend": "testbackend"}
+        id2 = service.upload_program(data='program/for-while.py', metadata=metadata)
+        metadata = {"name": "raise-exception", "backend": "testbackend"}
+        id3 = service.upload_program(data='program/raise-exception.py', metadata=metadata)
+        print('id1:', id1)
+        print('id2:', id2)
+        print('id3:', id3)
 
     @staticmethod
     def TestUploadMore(num: int):
@@ -30,14 +36,14 @@ class TestAPI:
         account = Account("testapitoken")
         service = RuntimeService(account)
         service.list_programs(refresh=True, detailed=False, limit=20)
-        service.program()
+        # service.program(program_id='e2afae0de2de482e9b057e8f510559ac')
 
     @staticmethod
     def TestUpdateProgram():
         account = Account("testapitoken")
         service = RuntimeService(account)
         service.update_program(program_id='1304493a31d34e4d8e73e3164d0cb8ed',
-                               data='program/hello2.py',
+                               data='program/raise-exception.py',
                                description='The program is created by QuaFu')
         # service.program()
 
@@ -107,7 +113,9 @@ if __name__ == '__main__':
     # TestAPI.TestJob_wait()
     # TestAPI.TestJob_nowait()
     # TestAPI.parallelTest(num=5)
-    # TestAPI.TestGetPrograms()
+    TestAPI.TestGetPrograms()
+    # TestAPI.TestUpload()
+    # TestAPI.TestUploadMore(10)
     # TestAPI.TestUpdateProgram()
     # TestAPI.TestDelProgram()
     #job = TestAPI.TestRun()

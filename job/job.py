@@ -234,9 +234,9 @@ class Job:
         """
         Return job error message.
         """
-        if self.status == "Failed":
+        if self._status == "Failed":
             if self._error_msg is None:
                 self._error_msg = self._result
             return self._error_msg
         else:
-            return f"The job's status is:{self._status}"
+            return f"The job's status is: {self._status}"
