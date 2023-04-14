@@ -172,7 +172,7 @@ class RuntimeService:
         program_metadata = self._read_metadata(metadata)
         if "name" not in program_metadata or not program_metadata["name"]:
             raise ArgsException(f"name is a required metadata field.")
-        if "backend" not in program_metadata or not program_metadata["name"]:
+        if "backend" not in program_metadata or not program_metadata["backend"]:
             raise ArgsException(f"backend is a required metadata field.")
 
         if "def run(" not in data:
@@ -333,7 +333,7 @@ class RuntimeService:
             ) from None
         elif status_code == 404:
             raise ProgramNotFoundException(
-                f"Program not found: {program_id}"
+                f"Program not found: {program_id} name:{name}"
             ) from None
         elif status_code == 401:
             raise InputValuexception(
@@ -347,6 +347,8 @@ class RuntimeService:
             raise RunFailedException(f"Failed to run program: {program_id}") from None
         if backend is None:
             backend = response["backend"]
+        if program_id is None:
+            program_id = response["program_id"]
         job = Job(
             status=response["status"],
             backend=backend,

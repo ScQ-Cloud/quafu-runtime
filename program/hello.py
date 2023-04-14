@@ -1,6 +1,7 @@
 import numpy as np
 from quafu import QuantumCircuit
 from quafu import simulate
+# used to test api
 def prepare_circuits():
     q = QuantumCircuit(5)
     q.x(0)

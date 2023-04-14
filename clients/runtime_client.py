@@ -114,10 +114,12 @@ class RuntimeClient:
         url = self.get_url("programs_run_deploy")
         payload = {
             "program_id": program_id,
-            "program_name": name,
-            "backend": backend,
-            "params": params
+            "program_name": name
         }
+        if backend is not None:
+            payload['backend'] = backend
+        if params is not None:
+            payload['params'] = params
         data = json.dumps(payload)
         res = self._session.post(url, headers=self.headers, data=data)
         if res.status_code == 200:
@@ -258,7 +260,7 @@ class RuntimeClient:
         else:
             return res.status_code, None
 
-    def job_status(self):
+    def job_status(self, job_id: str):
         url = self.get_url("job_status")
         payload = {
             "job_id": job_id,

@@ -50,6 +50,8 @@ class Job:
                 self._status = self._status_map[status]
                 self._finish_time = finish_time
                 self._result = result
+            if self._status == 'Failed':
+                self._error_msg = self._result
         else:
             status_code, response = self._client.job_result_nowait(
                 job_id=job_id
@@ -68,7 +70,7 @@ class Job:
             self._result = response['result']
             self._status = self._status_map[response['status']]
             self._finish_time = response['finish_time']
-            return response
+        return response
 
     def interim_results(self):
         """
@@ -200,9 +202,9 @@ class Job:
         """
         Return job error message.
         """
-        if self.status == "Failed":
+        if self._status == "Failed":
             if self._error_msg is None:
                 self._error_msg = self._result
             return self._error_msg
         else:
-            return f"The job's status is:{self._status}"
+            return f"The job's status is: {self._status}"
