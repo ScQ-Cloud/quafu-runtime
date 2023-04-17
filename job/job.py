@@ -1,6 +1,6 @@
 from clients.runtime_client import RuntimeClient
 from rtexceptions.rtexceptions import ArgsException, JobNotFoundException, NotAuthorizedException, RunFailedException
-
+from clients.account import Account
 
 class Job:
     """
@@ -9,19 +9,23 @@ class Job:
     """
 
     def __init__(self,
-                 status: int,
-                 api_client: RuntimeClient,
-                 backend: str,
-                 creation_date: str,
-                 job_id: str = None,
+                 account: Account,
+                 job_id: str,
+                 status: int = 0,
+                 api_client: RuntimeClient = None,
+                 backend: str = None,
+                 creation_date: str = None,
                  program_id: str = None,
                  params: str = None,
                  ):
-        self.params = params
+        # consider get job just by job id and account!
+        self._job_id = job_id
         self._client = api_client
+        if self._client is None:
+            self._client = RuntimeClient(token=account.get_token(), url=account.get_url())
+        self.params = params
         self.backend = backend
         self._status_map = {0: "In Queue", 1: "Running", 2: "Completed", 3: "Canceled", 4: "Failed"}
-        self._job_id = job_id
         self._program_id = program_id
         self._creation_date = creation_date
         self._status = self._status_map[status]
@@ -30,7 +34,7 @@ class Job:
         self._finish_time = None
         self._logs = None
 
-    #def result(self,
+    # def result(self,
     #           wait: bool):
     #    """
     #    Get the result from server. It will wait until job stop.
@@ -79,7 +83,7 @@ class Job:
             raise ArgsException("job_id is needed.")
         job_id = self.job_id()
         if self._result is not None:
-            return{
+            return {
                 'result': self._result,
                 'finished_time': self._finish_time,
                 'status': self._status
@@ -102,6 +106,10 @@ class Job:
         self._result = response['result']
         self._status = self._status_map[response['status']]
         self._finish_time = response['finish_time']
+        if response['status'] < 2:
+            del response['finish_time']
+            self._finish_time = None
+        response['status'] = self._status
         return response
 
     def interim_results(self):
@@ -128,6 +136,7 @@ class Job:
             )from None
         elif status_code != 200:
             raise RunFailedException(f"Failed to cancel job: {job_id}") from None
+        self._status = self._status_map[response['status']]
         return response
 
     def status(self):
@@ -164,7 +173,7 @@ class Job:
         Return job logs.
         """
         # Already Have Logs
-        if self._logs != None:
+        if self._status in ['Canceled', 'Failed', 'Completed'] and self._logs is not None:
             print(f"Job status: {self._status},logs:{self._logs}")
             return self._logs
         if self._job_id is None:
@@ -182,11 +191,8 @@ class Job:
         elif status_code != 200:
             raise RunFailedException(f"Failed to get job: {job_id} logs") from None
         self._status = self._status_map[response['status']]
-        if self._status in ['Canceled', 'Failed', 'Completed']:
-            self._logs = response['logs']
-            if self._logs is None:
-                self._logs = 'None'
-        print(f"Job status: {self._status},logs:{self._logs}")
+        self._logs = response['logs']
+        print(f"Job status: {self._status}")
         return response['logs']
 
     def delete(self) -> bool:

@@ -23,7 +23,7 @@ class Account:
         """
         Save your apitoken associate your Quafu account.
 
-        TODO: It may storage many apitoken.
+        TODO: It may store many apitoken.
         """
         self.apitoken = apitoken
         homedir = get_homedir.get_homedir()

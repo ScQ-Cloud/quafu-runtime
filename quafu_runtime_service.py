@@ -15,6 +15,7 @@ class RuntimeService:
 
     def __init__(self,
                  account: Account):
+        self._account = account
         self._url = account.get_url()
         self._token = account.get_token()
         self._client = RuntimeClient(self._token, self._url)
@@ -370,6 +371,7 @@ class RuntimeService:
         if program_id is None:
             program_id = response["program_id"]
         job = Job(
+            account=self._account,
             status=response["status"],
             backend=backend,
             api_client=self._client,
