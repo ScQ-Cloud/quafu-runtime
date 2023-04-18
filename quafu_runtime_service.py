@@ -6,7 +6,7 @@ from rtexceptions.rtexceptions import *
 from clients.account import Account
 from clients.runtime_client import RuntimeClient
 from job.job import Job
-
+from utils.check_python import check
 
 class RuntimeService:
     """
@@ -176,11 +176,21 @@ class RuntimeService:
         if "backend" not in program_metadata or not program_metadata["backend"]:
             raise ArgsException(f"backend is a required metadata field.")
 
+        filename = None
         if "def run(" not in data:
             # This is the program file
             with open(data, "r", encoding="utf-8") as file:
                 data = file.read()
+            filename = data
+        # Check the program before upload it!
+        if filename is None:
+            filename = 'upload_temp.py'
+            file = open(filename, 'w')
+            file.write(data)
+            file.close()
+        check(data, filename)
 
+        # Upload it.
         program_data = to_base64_string(data)
         status_code, response = self._client.program_upload(
             program_data=program_data, **program_metadata

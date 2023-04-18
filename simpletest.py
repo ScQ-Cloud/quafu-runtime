@@ -48,6 +48,14 @@ class TestAPI:
         # service.program()
 
     @staticmethod
+    def TestCheckSourceCode():
+        account = Account("testapitoken")
+        service = RuntimeService(account)
+        metadata = {"name": "program_with_error", "backend": "testbackend"}
+        service.upload_program(data='program/program_with_error.py',
+                               metadata=metadata)
+
+    @staticmethod
     def TestDelProgram():
         account = Account("testapitoken")
         service = RuntimeService(account)
@@ -107,17 +115,19 @@ def test_args(name: str = None):
     else:
         print("None")
 
+
 if __name__ == '__main__':
     print(os.getcwd())
     # TestAPI.TestRun()
     # TestAPI.TestJob_wait()
     # TestAPI.TestJob_nowait()
     # TestAPI.parallelTest(num=5)
-    TestAPI.TestGetPrograms()
+    # TestAPI.TestGetPrograms()
     # TestAPI.TestUpload()
     # TestAPI.TestUploadMore(10)
     # TestAPI.TestUpdateProgram()
     # TestAPI.TestDelProgram()
     #job = TestAPI.TestRun()
     #TestAPI.TestJobCancel(job.job_id())
-    TestJob_wait()
+    # TestJob_wait()
+    TestAPI.TestCheckSourceCode()
