@@ -12,10 +12,10 @@ class TestAPI:
     def TestUpload():
         account = Account("testapitoken")
         service = RuntimeService(account)
-        metadata = {"name": "hello", "backend": "testbackend"}
-        id1 = service.upload_program(data='program/hello.py', metadata=metadata)
         metadata = {"name": "for-while", "backend": "testbackend"}
         id2 = service.upload_program(data='program/for-while.py', metadata=metadata)
+        metadata = {"name": "hello", "backend": "testbackend"}
+        id1 = service.upload_program(data='program/hello.py', metadata=metadata)
         metadata = {"name": "raise-exception", "backend": "testbackend"}
         id3 = service.upload_program(data='program/raise-exception.py', metadata=metadata)
         print('id1:', id1)
@@ -93,20 +93,20 @@ class TestAPI:
         nums = num
         plist = []
         for i in range(nums):
-            p = multiprocessing.Process(target=TestJob_wait)
+            p = multiprocessing.Process(target=TestAPI.TestJob_wait)
             plist.append(p)
             p.start()
         for p in plist:
             p.join()
 
-
-def TestJob_wait():
-    account = Account("testapitoken")
-    service = RuntimeService(account)
-    job = service.run(program_id="409c55020cda4eedbae341fe316c1970", backend="py_simu", inputs="zxxx")
-    print(job.job_id())
-    print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-    print(job.result(wait=True))
+    @staticmethod
+    def TestJob_wait():
+        account = Account("testapitoken")
+        service = RuntimeService(account)
+        job = service.run(name='raise-exception', backend="py_simu", inputs="zxxx")
+        print(job.job_id())
+        print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        print(job.result(wait=True))
 
 
 def test_args(name: str = None):
@@ -123,11 +123,11 @@ if __name__ == '__main__':
     # TestAPI.TestJob_nowait()
     # TestAPI.parallelTest(num=5)
     # TestAPI.TestGetPrograms()
-    # TestAPI.TestUpload()
+    TestAPI.TestUpload()
     # TestAPI.TestUploadMore(10)
     # TestAPI.TestUpdateProgram()
     # TestAPI.TestDelProgram()
-    #job = TestAPI.TestRun()
+    # job = TestAPI.TestRun()
     #TestAPI.TestJobCancel(job.job_id())
-    # TestJob_wait()
-    TestAPI.TestCheckSourceCode()
+    # TestAPI.TestJob_wait()
+    # TestAPI.TestCheckSourceCode()

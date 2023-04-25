@@ -36,38 +36,63 @@ class DuplicateProgramException(ClientExceptions):
     """
     Exception raised after upload a program with duplicated name.
     """
+    pass
 
 
 class NotAuthorizedException(ClientExceptions):
     """
     Exception raised when a service is invoked from an unauthorized account.
     """
+    pass
 
 
 class UploadException(ClientExceptions):
     """Exception raised when Upload a program failed."""
+    pass
+
 
 class UpdateException(ClientExceptions):
     """Exception raised when Update a program failed."""
+    pass
+
 
 class ProgramNotFoundException(ClientExceptions):
     """Exception raised when program id not found."""
+    pass
 
 
 class RunFailedException(ClientExceptions):
     """Exception raised when program run failed."""
 
 
-class InputValuexception(ClientExceptions):
+class InputValueException(ClientExceptions):
     """Exception raised when program input is invalid."""
+    pass
 
 
 class ProgramNotValidException(ClientExceptions):
     """Exception raised when program data is invalid."""
+    pass
 
 
 class JobNotFoundException(ClientExceptions):
     """Exception raised when job is not found."""
+    pass
 
 
+class WebsocketError(ClientExceptions):
+    """Exceptions related to websockets."""
+    pass
 
+
+class WebsocketTimeoutError(ClientExceptions):
+    """Exceptions related to websockets."""
+    pass
+
+
+class RuntimeJobTimeoutError(ClientExceptions):
+    """Exception raised when waiting for jobs time out."""
+
+
+class RuntimeInvalidStateError(ClientExceptions):
+    """Error raised when job state is not expected."""

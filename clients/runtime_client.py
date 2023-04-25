@@ -20,7 +20,6 @@ class RuntimeClient:
                  ):
         self._token = token
         self._url = url + "/runtime"
-        self._socket_url = 'ws://192.168.220.55:8765'
         self._session = requests.session()
         self.headers = {'Content-Type': 'application/json;charset=UTF-8', 'api_token': self._token}
 

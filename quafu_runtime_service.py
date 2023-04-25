@@ -248,10 +248,19 @@ class RuntimeService:
             )
             return
         if data:
+            filename = None
             if "def run(" not in data:
                 # This is the program file
                 with open(data, "r", encoding="utf-8") as file:
                     data = file.read()
+                filename = data
+            # Check the program before upload it!
+            if filename is None:
+                filename = 'upload_temp.py'
+                file = open(filename, 'w')
+                file.write(data)
+                file.close()
+            check(data, filename)
             data = to_base64_string(data)
 
         if metadata:
@@ -367,7 +376,7 @@ class RuntimeService:
                 f"Program not found: {program_id} name:{name}"
             ) from None
         elif status_code == 401:
-            raise InputValuexception(
+            raise InputValueException(
                 f"params of run is invalid:{inputs}"
             )from None
         elif status_code == 405:
