@@ -108,13 +108,14 @@ class TestAPI:
         print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         print(job.result(wait=True))
 
+    @staticmethod
+    def TestWebsockets():
+        account = Account("testapitoken")
+        job = Job(account=account, job_id='testwebsocket')
+        job.interim_results(callback=callback)
 
-def test_args(name: str = None):
-    if name:
-        print("name:", name)
-    else:
-        print("None")
-
+def callback(job_id:str,message:dict):
+    print(f"job_id:{job_id}, message:{message}")
 
 if __name__ == '__main__':
     print(os.getcwd())
@@ -123,7 +124,7 @@ if __name__ == '__main__':
     # TestAPI.TestJob_nowait()
     # TestAPI.parallelTest(num=5)
     # TestAPI.TestGetPrograms()
-    TestAPI.TestUpload()
+    # TestAPI.TestUpload()
     # TestAPI.TestUploadMore(10)
     # TestAPI.TestUpdateProgram()
     # TestAPI.TestDelProgram()

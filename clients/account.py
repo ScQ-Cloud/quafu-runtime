@@ -19,6 +19,7 @@ class Account:
             self._token = apitoken
             # self._url = "http://quafu.baqis.ac.cn/"
             self._url = "http://127.0.0.1:5000/"
+            self._url_ws = "ws://127.0.0.1"
     def save_apitoken(self, apitoken):
         """
         Save your apitoken associate your Quafu account.
@@ -51,6 +52,8 @@ class Account:
     def get_url(self):
         return self._url
 
+    def get_url_ws(self):
+        return self._url_ws
     def get_token(self):
         return self._token
 

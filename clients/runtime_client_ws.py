@@ -51,16 +51,15 @@ class RuntimeWebsocketClient(ABC):
         """WebsocketClient constructor.
 
         Args:
-            websocket_url: URL for websocket communication with IBM Quantum.
             account: Account used to get token.
             job_id: Job ID.
             message_queue: Queue used to hold received messages.
         """
-        self._socket_url = 'ws://192.168.220.55:8765'
+        self._websocket_url = account.get_url_ws()
         self._access_token = account.get_token()
         self._job_id = job_id
         self._message_queue = message_queue
-        self._header = {'token': self._access_token}
+        self._header = {'token': self._access_token, 'job_id': self._job_id}
         self._ws: Optional[WebSocketApp] = None
         self._authenticated = False
         self._cancelled = False
@@ -94,7 +93,7 @@ class RuntimeWebsocketClient(ABC):
         Raises:
             WebsocketError: If a websocket error occurred.
         """
-        url = "{}/stream/jobs/{}".format(self._websocket_url, self._job_id)
+        url = "{}/jobs/{}".format(self._websocket_url, self._job_id)
         self.stream(url=url, retries=max_retries, backoff_factor=backoff_factor)
 
     def _handle_stream_iteration(self) -> None:
