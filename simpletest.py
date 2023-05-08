@@ -1,5 +1,6 @@
 import datetime
 import os
+import time
 from time import sleep
 
 from clients.account import Account
@@ -18,9 +19,12 @@ class TestAPI:
         id1 = service.upload_program(data='program/hello.py', metadata=metadata)
         metadata = {"name": "raise-exception", "backend": "testbackend"}
         id3 = service.upload_program(data='program/raise-exception.py', metadata=metadata)
+        metadata = {"name": "long-run-task", "backend": "testbackend"}
+        id4 = service.upload_program(data='program/long-run-task.py', metadata=metadata)
         print('id1:', id1)
         print('id2:', id2)
         print('id3:', id3)
+        print('id4:', id4)
 
     @staticmethod
     def TestUploadMore(num: int):
@@ -111,11 +115,15 @@ class TestAPI:
     @staticmethod
     def TestWebsockets():
         account = Account("testapitoken")
-        job = Job(account=account, job_id='testwebsocket')
+        servie = RuntimeService(account)
+        job = servie.run(name='long-run-task', inputs='zxxx')
         job.interim_results(callback=callback)
+        # job.interim_result_cancel()
 
-def callback(job_id:str,message:dict):
+
+def callback(job_id:str, message:dict):
     print(f"job_id:{job_id}, message:{message}")
+
 
 if __name__ == '__main__':
     print(os.getcwd())
@@ -132,3 +140,4 @@ if __name__ == '__main__':
     #TestAPI.TestJobCancel(job.job_id())
     # TestAPI.TestJob_wait()
     # TestAPI.TestCheckSourceCode()
+    TestAPI.TestWebsockets()
