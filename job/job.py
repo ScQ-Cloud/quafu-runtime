@@ -161,7 +161,7 @@ class Job:
     def _start_websocket_client(self) -> None:
         """Start websocket client to stream results."""
         try:
-            logger.debug("Start websocket client for job %s", self.job_id())
+            logger.info("Start websocket client for job %s", self.job_id())
             self._ws_client.job_results()
         except Exception:  # pylint: disable=broad-except
             logger.warning(
@@ -173,7 +173,7 @@ class Job:
         finally:
             self._result_queue.put_nowait(self._POISON_PILL)
 
-    def cancel_interim_result_streaming(self) -> None:
+    def interim_result_cancel(self) -> None:
         """Cancel result streaming."""
         if not self._is_streaming():
             return
@@ -192,13 +192,14 @@ class Job:
             user_callback: User callback function.
             decoder: A :class:`ResultDecoder` (sub)class used to decode job results.
         """
-        logger.debug("Start result streaming for job %s", self.job_id())
+        print("Start interim result streaming for job %s", self.job_id())
         _decoder = decoder or self._interim_result_decoder
         while True:
             try:
                 response = result_queue.get()
                 if response == self._POISON_PILL:
                     self._empty_result_queue(result_queue)
+                    print("Interim result streaming finished")
                     return
 
                 # response = self._download_external_result(response)
