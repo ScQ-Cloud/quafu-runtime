@@ -16,7 +16,7 @@ def prepare_circuits():
     q.measure(measures,  cbits=cbits)
     return q
 
-def run(User,params):
+def run(backend, userpub, params):
     """The entry point of the program."""
     q = prepare_circuits()
     simu_res = simulate(q)

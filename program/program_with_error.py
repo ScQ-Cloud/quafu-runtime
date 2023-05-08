@@ -1,5 +1,5 @@
 from quafu import *
-def run(User,params):
+def run(backend, userpub, params):
     """The entry point of the program."""
     print("Hello World!", params)
     cout("xxx")
