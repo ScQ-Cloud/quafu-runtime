@@ -59,7 +59,7 @@ class RuntimeWebsocketClient(ABC):
         self._access_token = account.get_token()
         self._job_id = job_id
         self._message_queue = message_queue
-        self._header = {'token': self._access_token, 'job_id': self._job_id}
+        self._header = {'api_token': self._access_token, 'job_id': self._job_id}
         self._ws: Optional[WebSocketApp] = None
         self._authenticated = False
         self._cancelled = False
@@ -93,7 +93,7 @@ class RuntimeWebsocketClient(ABC):
         Raises:
             WebsocketError: If a websocket error occurred.
         """
-        url = "{}/jobs/{}".format(self._websocket_url, self._job_id)
+        url = self._websocket_url
         self.stream(url=url, retries=max_retries, backoff_factor=backoff_factor)
 
     def _handle_stream_iteration(self) -> None:
@@ -126,7 +126,7 @@ class RuntimeWebsocketClient(ABC):
             self.disconnect(WebsocketClientCloseCode.PROTOCOL_ERROR)
 
     def on_close(self, wsa: WebSocketApp, status_code: int, msg: str) -> None:
-        """Called when websocket connection clsed.
+        """Called when websocket connection closed.
 
         Args:
             wsa: WebSocketApp object.

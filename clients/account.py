@@ -18,8 +18,8 @@ class Account:
         else:
             self._token = apitoken
             # self._url = "http://quafu.baqis.ac.cn/"
-            self._url = "http://127.0.0.1:5000/"
-            self._url_ws = "ws://127.0.0.1"
+            self._url = "http://192.168.220.55:5000/"
+            self._url_ws = "ws://192.168.220.55:8765"
     def save_apitoken(self, apitoken):
         """
         Save your apitoken associate your Quafu account.
