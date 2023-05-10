@@ -137,12 +137,10 @@ class Job:
                 "A callback function is already streaming results."
             )
         self._ws_client_future = self._executor.submit(self._start_websocket_client)
-        self._executor.submit(
-            self._stream_results,
+        self._stream_results(
             result_queue=self._result_queue,
             user_callback=callback,
-            decoder=decoder,
-        )
+            decoder=decoder,)
 
     def _is_streaming(self) -> bool:
         """Return whether job results are being streamed.
@@ -246,7 +244,7 @@ class Job:
         elif status_code != 200:
             raise RunFailedException(f"Failed to cancel job: {job_id}") from None
         self._status = self._status_map[response['status']]
-        self.cancel_interim_result_streaming()
+        self.interim_result_cancel()
         return response
 
     def status(self):
