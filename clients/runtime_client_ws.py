@@ -186,7 +186,7 @@ class RuntimeWebsocketClient(ABC):
                 on_close=self.on_close,
             )
             try:
-                logger.debug(
+                logger.info(
                     "Starting new websocket connection: %s",
                     url
                 )

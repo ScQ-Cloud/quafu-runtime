@@ -166,7 +166,7 @@ class RuntimeClient:
 
     def job_result(self,
                    job_id: str,
-                   wait: bool=False):
+                   wait: bool = False):
         """
         Try to get result.
 
