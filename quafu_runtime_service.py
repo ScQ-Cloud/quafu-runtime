@@ -159,16 +159,18 @@ class RuntimeService:
                        metadata: dict = None):
         """Upload a program to runtime server.
 
-            Args :
+            Args:
                 data: program str or the path of a program file(base64 encoded).
                 metadata: a dict or a file path.
-                    name: Name of the program.
-                    backend: Backend to run the circuits of the program.
-                    group: Not used. Group the program shared.
-                    description: Program description.
-                    max_execution_time: Maximum execution time.
-                    is_public: Whether the program should be public.
+                     name: Name of the program.
+                     backend: Backend to run the circuits of the program.
+                     group: Not used. Group the program shared.
+                     description: Program description.
+                     max_execution_time: Maximum execution time.
+                     is_public: Whether the program should be public.
 
+            Return:
+                Program_id, if upload succeed.
         """
         program_metadata = self._read_metadata(metadata)
         if "name" not in program_metadata or not program_metadata["name"]:

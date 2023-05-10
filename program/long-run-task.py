@@ -1,5 +1,5 @@
 from time import sleep
-def run(backend, userpub, params):
+def run(task, userpub, params):
     """The entry point of the program."""
     # q = prepare_circuits()
     # simu_res = simulate(q)
