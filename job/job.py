@@ -108,9 +108,13 @@ class Job:
         self._result = response['result']
         self._status = self._status_map[response['status']]
         self._finish_time = response['finish_time']
-        if response['status'] < 2:
+        if response['status'] != 2:
             del response['finish_time']
             self._finish_time = None
+        if response['status'] == 4:
+            self._error_msg = response['result']
+            response['error_msg'] = self._error_msg
+            del response['result']
         response['status'] = self._status
         return response
 
