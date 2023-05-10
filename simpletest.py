@@ -70,9 +70,11 @@ class TestAPI:
     def TestRun():
         account = Account("testapitoken")
         service = RuntimeService(account)
-        job = service.run(program_id="409c55020cda4eedbae341fe316c1970", backend="py_simu", inputs="zsl")
+        job = service.run(name='raise-exception', backend="py_simu", inputs="zsl")
         print(job.job_id())
-        return job
+        result = job.result(wait=True)
+        print(result)
+        # return job
 
     @staticmethod
     def TestJobCancel(job_id: str):
@@ -107,7 +109,7 @@ class TestAPI:
     def TestJob_wait():
         account = Account("testapitoken")
         service = RuntimeService(account)
-        job = service.run(name='raise-exception', backend="py_simu", inputs="zxxx")
+        job = service.run(name='long-run-task', backend="py_simu", inputs="zxxx")
         print(job.job_id())
         print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         print(job.result(wait=True))
@@ -121,7 +123,7 @@ class TestAPI:
         # job.interim_result_cancel()
 
 
-def callback(job_id:str, message:dict):
+def callback(job_id, message):
     print(f"job_id:{job_id}, message:{message}")
 
 
