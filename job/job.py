@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import queue
 import traceback
@@ -9,7 +10,7 @@ from clients.runtime_client_ws import WebsocketClientCloseCode, RuntimeWebsocket
 from job.decoder import ResultDecoder
 from job.jobstatus import JOB_FINAL_STATES, JobStatus
 from rtexceptions.rtexceptions import ArgsException, JobNotFoundException, NotAuthorizedException, RunFailedException, \
-    RuntimeInvalidStateError
+    RuntimeInvalidStateError, AsyncioWebsocketError
 from clients.account import Account
 
 logger = logging.getLogger(__name__)
@@ -163,14 +164,12 @@ class Job:
     def _start_websocket_client(self) -> None:
         """Start websocket client to stream results."""
         try:
-            logger.info("Start websocket client for job %s", self.job_id())
+            print("Start websocket client for job ", self.job_id())
             self._ws_client.job_results()
         except Exception:  # pylint: disable=broad-except
-            logger.warning(
-                "An error occurred while streaming results "
-                "from the server for job %s:\n%s",
-                self.job_id(),
-                traceback.format_exc(),
+            print(
+                f"An error occurred while streaming results"
+                f" from the server for job {self.job_id()}:\n {traceback.format_exc()}"
             )
         finally:
             self._result_queue.put_nowait(self._POISON_PILL)
@@ -194,7 +193,7 @@ class Job:
             user_callback: User callback function.
             decoder: A :class:`ResultDecoder` (sub)class used to decode job results.
         """
-        print("Start interim result streaming for job %s", self.job_id())
+        print("Start interim result streaming for job", self.job_id())
         _decoder = decoder or self._interim_result_decoder
         while True:
             try:
@@ -203,9 +202,6 @@ class Job:
                     self._empty_result_queue(result_queue)
                     print("Interim result streaming finished")
                     return
-
-                # response = self._download_external_result(response)
-
                 user_callback(self.job_id(), _decoder.decode(response))
             except Exception:  # pylint: disable=broad-except
                 logger.warning(
