@@ -186,17 +186,11 @@ class RuntimeWebsocketClient(ABC):
                 on_close=self.on_close,
             )
             try:
-                logger.info(
-                    "Starting new websocket connection: %s",
-                    url
-                )
                 self._reset_state()
                 self._ws.run_forever(
                     ping_interval=60, ping_timeout=10
                 )
                 self.connected = False
-
-                logger.debug("Websocket run_forever finished.")
 
                 # Handle path-specific errors
                 self._handle_stream_iteration()
