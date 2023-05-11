@@ -119,7 +119,7 @@ class TestAPI:
         servie = RuntimeService(account)
         job = servie.run(name='long-run-task', inputs='zxxx')
         job.interim_results(callback=callback)
-        job.interim_result_cancel()
+        # job.interim_result_cancel()
         print(job.result(wait=True))
 
 
@@ -138,8 +138,8 @@ if __name__ == '__main__':
     # TestAPI.TestUploadMore(10)
     # TestAPI.TestUpdateProgram()
     # TestAPI.TestDelProgram()
-    job = TestAPI.TestRun()
+    # job = TestAPI.TestRun()
     #TestAPI.TestJobCancel(job.job_id())
     # TestAPI.TestJob_wait()
     # TestAPI.TestCheckSourceCode()
-    # TestAPI.TestWebsockets()
+    TestAPI.TestWebsockets()
