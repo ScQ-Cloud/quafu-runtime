@@ -19,7 +19,7 @@ def on_close(wsa: websocket.WebSocketApp, status_code, msg):
     # wsa.send('Close')
 
 
-def on_error(ws,error):
+def on_error(wsa, error):
     print(error)
 
 

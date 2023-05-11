@@ -70,8 +70,7 @@ class TestAPI:
     def TestRun():
         account = Account("testapitoken")
         service = RuntimeService(account)
-        job = service.run(name='raise-exception', backend="py_simu", inputs="zsl")
-        print(job.job_id())
+        job = service.run(name='hello', backend="py_simu", inputs="zsl")
         result = job.result(wait=True)
         print(result)
         # return job
@@ -120,7 +119,8 @@ class TestAPI:
         servie = RuntimeService(account)
         job = servie.run(name='long-run-task', inputs='zxxx')
         job.interim_results(callback=callback)
-        # job.interim_result_cancel()
+        job.interim_result_cancel()
+        print(job.result(wait=True))
 
 
 def callback(job_id, message):
@@ -138,8 +138,8 @@ if __name__ == '__main__':
     # TestAPI.TestUploadMore(10)
     # TestAPI.TestUpdateProgram()
     # TestAPI.TestDelProgram()
-    # job = TestAPI.TestRun()
+    job = TestAPI.TestRun()
     #TestAPI.TestJobCancel(job.job_id())
     # TestAPI.TestJob_wait()
     # TestAPI.TestCheckSourceCode()
-    TestAPI.TestWebsockets()
+    # TestAPI.TestWebsockets()

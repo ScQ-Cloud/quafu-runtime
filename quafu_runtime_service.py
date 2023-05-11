@@ -401,6 +401,7 @@ class RuntimeService:
             program_id=program_id,
             params=inputs,
         )
+        print(f'job created, job_id is {job.job_id()}')
         return job
 
     def _read_metadata(self, metadata: str = None) -> dict:
