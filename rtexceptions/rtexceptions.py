@@ -96,3 +96,7 @@ class RuntimeJobTimeoutError(ClientExceptions):
 
 class RuntimeInvalidStateError(ClientExceptions):
     """Error raised when job state is not expected."""
+
+
+class AsyncioWebsocketError(ClientExceptions):
+    """Error raised when Async websocket client failed."""
