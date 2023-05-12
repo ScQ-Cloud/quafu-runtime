@@ -6,8 +6,13 @@ class UserPub:
     Usage: userpub.pulish(message)
     """
     def publish(self, message: bytes):
-        """
-        It only receives message(type of bytes).
-        So you should change your data to bytes before publish it. Or it will raise exception and the job will fail.
+        """Publish message to client.
+
+        arg message must be bytes type, so you should convert your data to bytes before publish it. Or it will raise exception and the job will fail.
+
+        Args:
+            message: Msg user want to publish when running.
+
+
         """
         pass

@@ -8,13 +8,61 @@ from clients.runtime_client import RuntimeClient
 from job.job import Job
 from utils.check_python import check
 
+
 class RuntimeService:
-    """
-    Class for interacting with the Quafu Runtime service.
+    """Class for interacting with the Quafu Runtime service.
+
+    A sample workflow of using the runtime service::
+
+        from clients import Account
+        from job import Job
+        from quafu_runtime_service import RuntimeService
+
+        # get RuntimeService
+        account = Account(api_token="testapitoken")
+        service = RuntimeService(account)
+        
+        # Upload program
+        metadata = {"name": "long-run-task", "backend": "testbackend"}
+        id1 = service.upload_program(data='/program/hello.py',metadata=metadata)
+        print(id1)
+
+        # Run a program
+        job1 = service.run(name='long-run-task',inputs={'TestParam':'xxxxxx'})
+
+        # Define callback function
+        def callback(job_id, message):
+        print(message)
+        # Get job interim result
+        job1.interim_results(callback=callback)
+
+        # Get job result
+        result = job1.result(wait=True)
+        print(result)
+
+        # Get job logs
+        logs = job1.logs()
+
+    The simple example above use teh :meth`run` method directly to invoke a program.
+
+    If the program has any interim results, you can use the :meth: `Job.interim_results` method to stream
+    the results at a later time, but before the interim result expires.
+
+    The :meth:`run` method returns a
+    :class:`RuntimeJob` object. You can use its methods to perform tasks like checking job status, getting job result, and
+    canceling job.
     """
 
     def __init__(self,
                  account: Account):
+        """QiskitRuntimeService constructor
+
+        Args:
+            account: Account instance.
+
+        Returns:
+            An instance of service.
+        """
         self._account = account
         self._url = account.get_url()
         self._token = account.get_token()
@@ -31,8 +79,7 @@ class RuntimeService:
         """Pretty print information about available runtime programs.
 
         Args:
-            refresh: If ``True``, re-query the server for the programs. Otherwise
-                return the cached value.
+            refresh: If `True`, re-query the server for the programs. Otherwise, return the cached value.
             detailed: If ``True`` print all details about available runtime programs.
             limit: The number of programs returned at a time. Default and maximum
                 value of 20.
@@ -117,6 +164,11 @@ class RuntimeService:
 
         Args:
             refresh: if refresh is true or never fetch the program, get it from server.
+            name: Program name.
+            program_id: Program ID.
+
+        Returns:
+            Program Msg.
         """
         # return result from cache
         if refresh is False:
@@ -148,12 +200,6 @@ class RuntimeService:
         self._programs[program_id] = response
         return response
 
-    # def backends(self):
-    #     """
-    #     Get backends provided by server.
-    #     """
-    #     pass
-
     def upload_program(self,
                        data: str,
                        metadata: dict = None):
@@ -162,12 +208,12 @@ class RuntimeService:
             Args:
                 data: program str or the path of a program file(base64 encoded).
                 metadata: a dict or a file path.
-                     name: Name of the program.
-                     backend: Backend to run the circuits of the program.
-                     group: Not used. Group the program shared.
-                     description: Program description.
-                     max_execution_time: Maximum execution time.
-                     is_public: Whether the program should be public.
+                     * name: Name of the program.
+                     * backend: Backend to run the circuits of the program.
+                     * group: Not used. Group the program shared.
+                     * description: Program description.
+                     * max_execution_time: Maximum execution time.
+                     * is_public: Whether the program should be public.
 
             Return:
                 Program_id, if upload succeed.
@@ -241,6 +287,9 @@ class RuntimeService:
                 is_public: Program set to public or not.
                 backend: Backend to run the circuits of the program.
                 group: Not used. Group the program shared.
+
+            Returns:
+                Program msg of the updated program.
         """
         if not any([data, metadata, description, max_execution_time, is_public, backend, group]):
             warnings.warn(
