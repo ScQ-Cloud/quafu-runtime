@@ -122,6 +122,8 @@ class TestAPI:
         # job.interim_result_cancel()
         print(job.result(wait=True))
 
+    def TestJob(self):
+        job = Job()
 
 def callback(job_id, message):
     print(f"job_id:{job_id}, message:{message}")

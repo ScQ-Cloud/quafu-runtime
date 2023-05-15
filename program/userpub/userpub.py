@@ -12,7 +12,5 @@ class UserPub:
 
         Args:
             message: Msg user want to publish when running.
-
-
         """
         pass

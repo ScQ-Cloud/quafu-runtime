@@ -7,9 +7,7 @@ import websockets
 
 
 class RuntimeClient:
-    """Class for accessing Quafu runtime server.
-
-    """
+    """Class for accessing Quafu runtime server."""
 
     def __init__(self,
                  token: str,
