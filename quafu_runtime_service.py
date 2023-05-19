@@ -123,17 +123,16 @@ class RuntimeService:
                 status, response = self._client.get_programs(
                     limit=fetch_page_limit, skip=offset
                 )
-                if status == 403:
-                    raise NotAuthorizedException(
-                        "You are not authorized to get programs."
-                    ) from None
+                if status == 201:
+                    raise CheckApiTokenError("API_TOKEN ERROR.") from None
                 elif status == 405:
                     raise ArgsException(
-                        "Your args limit or offset is wrong or not provided."
+                        "Limit or offset is wrong or not provided."
                     ) from None
                 elif status != 200:
                     raise UploadException(f"Failed to fetch programs: Unkown Error.") from None
 
+                response = response['data']
                 program_page = response.get("programs", [])
                 # count is the total number of programs that would be returned if
                 # there was no limit or skip
@@ -180,6 +179,8 @@ class RuntimeService:
         status, response = self._client.program_get(
             program_id=program_id, name=name
         )
+        if status == 201:
+            raise CheckApiTokenError("API_TOKEN ERROR.") from None
         if status == 403:
             raise NotAuthorizedException(
                 "You are not authorized to get program."
@@ -194,6 +195,7 @@ class RuntimeService:
             ) from None
         elif status != 200:
             raise UploadException(f"Failed to fetch program: Unkown Error.") from None
+        response = response['data']
         response['data'] = from_base64_string(response['data']).decode("utf-8")
         if self._programs is None:
             self._programs = {}
@@ -243,14 +245,11 @@ class RuntimeService:
         status_code, response = self._client.program_upload(
             program_data=program_data, **program_metadata
         )
-        # status_code = response["status"]
+        if status_code == 201:
+            raise CheckApiTokenError("API_TOKEN ERROR.") from None
         if status_code == 409:
             raise DuplicateProgramException(
                 "Program with the same name already exists."
-            ) from None
-        elif status_code == 403:
-            raise NotAuthorizedException(
-                "You are not authorized to upload programs."
             ) from None
         elif status_code == 406:
             raise ArgsException(
@@ -258,7 +257,7 @@ class RuntimeService:
             ) from None
         elif status_code != 200:
             raise UploadException(f"Failed to create program: Unkown Error.") from None
-
+        response = response['data']
         return response["id"]
 
     def update_program(
@@ -335,16 +334,15 @@ class RuntimeService:
         status_code, response = self._client.program_update(
             program_id=program_id, program_data=data, **combined_metadata
         )
-        if status_code == 403:
-            raise NotAuthorizedException(
-                "You are not authorized to update programs."
-            ) from None
+        if status_code == 201:
+            raise CheckApiTokenError("API_TOKEN ERROR.") from None
         elif status_code == 404:
             raise ProgramNotFoundException(
                 f"Program not found: {program_id}"
             )from None
         elif status_code != 200:
             raise UpdateException(f"Failed to update program: Unkown Error.") from None
+        response = response['data']
         response['data'] = from_base64_string(response['data']).decode("utf-8")
         print("After update, the program is:\n", response)
         if self._programs is None:
@@ -359,9 +357,11 @@ class RuntimeService:
                 program_id: Program ID.
         """
         status_code = self._client.program_delete(program_id=program_id)
-        if status_code == 403:
-            raise NotAuthorizedException(
-                "You are not authorized to update programs."
+        if status_code == 201:
+            raise CheckApiTokenError("API_TOKEN ERROR.") from None
+        if status_code == 404:
+            raise ProgramNotFoundException(
+                f"Program not found: {program_id}"
             ) from None
         elif status_code != 200:
             raise UpdateException(f"Failed to delete program: Unkown Error.") from None
@@ -369,26 +369,6 @@ class RuntimeService:
             del self._programs[program_id]
         print(f"Program {program_id} deleted.")
         return
-
-    def cancel(self, job_id: str):
-        """
-        Cancel a job running on the runtime server
-
-        Args:
-            job_id: Runtime job ID
-        """
-        status_code, response = self._client.job_cancel(job_id)
-        if status_code == 403:
-            raise NotAuthorizedException(
-                "You are not authorized to update programs."
-            ) from None
-        elif status_code == 404:
-            raise JobNotFoundException(
-                    f"Job not found: {job_id}."
-            ) from None
-        elif status_code != 200:
-            raise RunFailedException(f"Failed to cancel job: {job_id}") from None
-        print(f"Job {job_id} has been cancelled")
 
     def run(self,
             program_id: str = None,
@@ -418,10 +398,8 @@ class RuntimeService:
             backend=backend,
             params=inputs,
         )
-        if status_code == 403:
-            raise NotAuthorizedException(
-                "You are not authorized to update programs."
-            ) from None
+        if status_code == 201:
+            raise CheckApiTokenError("API_TOKEN ERROR") from None
         elif status_code == 404:
             raise ProgramNotFoundException(
                 f"Program not found: {program_id} name:{name}"
@@ -432,10 +410,11 @@ class RuntimeService:
             )from None
         elif status_code == 405:
             raise ProgramNotValidException(
-                f"Program is invalid:{inputs}"
+                f"Program is invalid, please check it and update it"
             )from None
         elif status_code != 200:
             raise RunFailedException(f"Failed to run program: {program_id}") from None
+        response = response['data']
         if backend is None:
             backend = response["backend"]
         if program_id is None:

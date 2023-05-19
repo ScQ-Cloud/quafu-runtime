@@ -7,11 +7,13 @@ from clients.account import Account
 from job.job import Job
 from quafu_runtime_service import RuntimeService
 
+API_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MTI3MiwiZXhwIjoxNjg1MTY0MjM1fQ.BuTKgSuvxjrZcgV8YmmkNScGvdQfrYbHphEMxI9n7p8"
+API_TOKEN = API_TOKEN[::-1]
 
 class TestAPI:
     @staticmethod
     def TestUpload():
-        account = Account("testapitoken")
+        account = Account(api_token=API_TOKEN)
         service = RuntimeService(account)
         metadata = {"name": "for-while", "backend": "testbackend"}
         id2 = service.upload_program(data='program/for-while.py', metadata=metadata)
@@ -28,7 +30,7 @@ class TestAPI:
 
     @staticmethod
     def TestUploadMore(num: int):
-        account = Account("testapitoken")
+        account = Account(api_token=API_TOKEN)
         service = RuntimeService(account)
         for i in range(num):
             metadata = {"name": "testname" + str(i + 10), "backend": "testbackend"}
@@ -37,23 +39,31 @@ class TestAPI:
 
     @staticmethod
     def TestGetPrograms():
-        account = Account("testapitoken")
+        account = Account(api_token=API_TOKEN)
         service = RuntimeService(account)
         service.list_programs(refresh=True, detailed=False, limit=20)
         # service.program(program_id='e2afae0de2de482e9b057e8f510559ac')
 
     @staticmethod
-    def TestUpdateProgram():
-        account = Account("testapitoken")
+    def TestGetProgram():
+        account = Account(api_token=API_TOKEN)
         service = RuntimeService(account)
-        service.update_program(program_id='1304493a31d34e4d8e73e3164d0cb8ed',
+        res = service.program(name='long-run-task')
+        print(res)
+
+    @staticmethod
+    def TestUpdateProgram():
+        account = Account(api_token=API_TOKEN)
+        service = RuntimeService(account)
+        service.update_program(program_id='3eaeb8960d22487abd6d8b4b91f40461',
                                data='program/raise-exception.py',
+                               is_public=True,
                                description='The program is created by QuaFu')
         # service.program()
 
     @staticmethod
     def TestCheckSourceCode():
-        account = Account("testapitoken")
+        account = Account(api_token=API_TOKEN)
         service = RuntimeService(account)
         metadata = {"name": "program_with_error", "backend": "testbackend"}
         service.upload_program(data='program/program_with_error.py',
@@ -61,14 +71,14 @@ class TestAPI:
 
     @staticmethod
     def TestDelProgram():
-        account = Account("testapitoken")
+        account = Account(api_token=API_TOKEN)
         service = RuntimeService(account)
-        service.delete_program(program_id='f08e063a0e7b42c48815cb5004fac7f2')
+        service.delete_program(program_id='3eaeb8960d22487abd6d8b4b91f40461')
         # service.program()
 
     @staticmethod
     def TestRun():
-        account = Account("testapitoken")
+        account = Account(api_token=API_TOKEN)
         service = RuntimeService(account)
         job = service.run(name='hello', backend="py_simu", inputs="zsl")
         result = job.result(wait=True)
@@ -76,14 +86,8 @@ class TestAPI:
         # return job
 
     @staticmethod
-    def TestJobCancel(job_id: str):
-        account = Account("testapitoken")
-        service = RuntimeService(account)
-        service.cancel(job_id)
-
-    @staticmethod
     def TestJob_nowait():
-        account = Account("testapitoken")
+        account = Account(api_token=API_TOKEN)
         service = RuntimeService(account)
         job = service.run(program_id="409c55020cda4eedbae341fe316c1970", backend="py_simu", inputs="zxxx")
         print(job.job_id())
@@ -106,7 +110,7 @@ class TestAPI:
 
     @staticmethod
     def TestJob_wait():
-        account = Account("testapitoken")
+        account = Account(api_token=API_TOKEN)
         service = RuntimeService(account)
         job = service.run(name='long-run-task', backend="py_simu", inputs="zxxx")
         print(job.job_id())
@@ -115,7 +119,7 @@ class TestAPI:
 
     @staticmethod
     def TestWebsockets():
-        account = Account("testapitoken")
+        account = Account(api_token=API_TOKEN)
         servie = RuntimeService(account)
         job = servie.run(name='long-run-task', inputs='zxxx')
         job.interim_results(callback=callback)
@@ -136,12 +140,13 @@ if __name__ == '__main__':
     # TestAPI.TestJob_nowait()
     # TestAPI.parallelTest(num=5)
     # TestAPI.TestGetPrograms()
+    # TestAPI.TestGetProgram()
     # TestAPI.TestUpload()
     # TestAPI.TestUploadMore(10)
     # TestAPI.TestUpdateProgram()
     # TestAPI.TestDelProgram()
     # job = TestAPI.TestRun()
-    #TestAPI.TestJobCancel(job.job_id())
+    # job.cancel()
     # TestAPI.TestJob_wait()
     # TestAPI.TestCheckSourceCode()
     TestAPI.TestWebsockets()

@@ -55,12 +55,13 @@ class RuntimeClient:
             "group": group,
             "cost": max_execution_time,
             "description": description,
-            "is_public": 1 if is_public is True else 2,
+            "is_public": 1 if is_public is True else 0,
         }
         data = json.dumps(payload)
         res = self._session.post(url, headers=self.headers, data=data)
         if res.status_code == 200:
-            return res.status_code, res.json()
+            res = res.json()
+            return res['status'], res
         else:
             return res.status_code, None
 
@@ -104,7 +105,7 @@ class RuntimeClient:
             if max_execution_time:
                 payload["cost"] = max_execution_time
             if is_public:
-                payload["is_public"] = 1 if is_public is True else 2,
+                payload["is_public"] = 1 if is_public is True else 0,
             if group:
                 payload["group"] = group
             if backend:
@@ -113,7 +114,8 @@ class RuntimeClient:
         data = json.dumps(payload)
         res = self._session.post(url, headers=self.headers, data=data)
         if res.status_code == 200:
-            return res.status_code, res.json()
+            res = res.json()
+            return res['status'], res
         else:
             return res.status_code, None
 
@@ -128,7 +130,11 @@ class RuntimeClient:
         """
         url = self.get_url("program_delete")
         res = self._session.delete(url, headers=self.headers, params={'program_id': program_id})
-        return res.status_code
+        if res.status_code == 200:
+            res = res.json()
+            return res['status']
+        else:
+            return res.status_code
 
     def program_run(self,
                     program_id: str = None,
@@ -159,7 +165,8 @@ class RuntimeClient:
         data = json.dumps(payload)
         res = self._session.post(url, headers=self.headers, data=data)
         if res.status_code == 200:
-            return res.status_code, res.json()
+            res = res.json()
+            return res['status'], res
         else:
             return res.status_code, None
 
@@ -180,7 +187,8 @@ class RuntimeClient:
         }
         res = self._session.get(url, headers=self.headers, params=payload)
         if res.status_code == 200:
-            return res.status_code, res.json()
+            res = res.json()
+            return res['status'], res
         else:
             return res.status_code, None
 
@@ -202,7 +210,8 @@ class RuntimeClient:
         }
         res = self._session.get(url, headers=self.headers, params=payload)
         if res.status_code == 200:
-            return res.status_code, res.json()
+            res = res.json()
+            return res['status'], res
         else:
             return res.status_code, None
 
@@ -233,7 +242,8 @@ class RuntimeClient:
         data = json.dumps(payload)
         res = self._session.post(url, headers=self.headers, data=data)
         if res.status_code == 200:
-            return res.status_code, res.json()
+            res = res.json()
+            return res['status'], res
         else:
             return res.status_code, None
 
@@ -254,88 +264,10 @@ class RuntimeClient:
         data = json.dumps(payload)
         res = self._session.post(url, headers=self.headers, data=data)
         if res.status_code == 200:
-            return res.status_code, res.json()
+            res = res.json()
+            return res['status'], res
         else:
             return res.status_code, None
-
-    async def get_result(self,
-                         url: str,
-                         job_id: str):
-        """Get job result use websocket.
-
-        Args:
-            url: Websocket server url.
-            job_id: Program job ID.
-
-        Returns:
-            Job result.
-        """
-        count_retry = 0
-        retries = 5
-        flag = True
-        while flag:
-            try:
-                # Connect to the WebSocket server
-                print('Connecting to ', url)
-                async with websockets.connect('ws://192.168.220.55:8765') as websocket:
-                    print("try to get result...")
-                    message = {'type': 'result', 'job_id': job_id, 'api_token': self._token}
-                    await websocket.send(json.dumps(message))
-                    # Process incoming messages
-                    result = None
-                    status = -1
-                    finish_time = None
-                    async for message in websocket:
-                        mess = json.loads(message)
-                        type_ = mess['type']
-                        if type == 'failed':
-                            print('Something wrong: ', mess['error'])
-                            flag = False
-                            break
-                        elif type_ == 'done':
-                            finish_time = mess['finish_time']
-                            result = mess['result']
-                            status = mess['status']
-                            code = 'done' if status == 2 else 'error'
-                            if code != 'done':
-                                code = 'canceled' if status == 3 else 'failed'
-                            print(f'Job done, status: {code} , finish_time: {finish_time} ,result: {result}')
-                            flag = False
-                            break
-                        elif type_ == 'wait':
-                            status = mess['status']
-                            code = 'in queue' if status == 0 else 'running'
-                            print(f'Job has not finished, status: {code}, waiting...')
-                    # Return result!
-                    if flag is False:
-                        return status, finish_time, result
-
-            except websockets.WebSocketException as e:
-                # An error has occurred; schedule a restart
-                print(f"Connect to server Error:{e},Trying reconnect...")
-                await asyncio.sleep(1)
-                count_retry += 1
-                if retries <= count_retry:
-                    print("Failed connect to server.")
-                    break
-        return -1, None, None
-
-    def job_result_wait(self,
-                        job_id: str):
-        """Wait until job done. Implemented by websockets.
-
-        Args:
-            job_id: Program job ID.
-
-        Return:
-            Job result.
-        """
-        url = self.get_url("get_result_wait")
-        return asyncio.get_event_loop().run_until_complete(self.get_result(url, job_id))
-
-    def job_interim_results(self):
-        """Get job interim result."""
-        pass
 
     def job_cancel(self, job_id):
         """Cancel a job.
@@ -353,7 +285,8 @@ class RuntimeClient:
         data = json.dumps(payload)
         res = self._session.post(url, headers=self.headers, data=data)
         if res.status_code == 200:
-            return res.status_code, res.json()
+            res = res.json()
+            return res['status'], res
         else:
             return res.status_code, None
 
@@ -372,7 +305,8 @@ class RuntimeClient:
         }
         res = self._session.get(url, headers=self.headers, params=payload)
         if res.status_code == 200:
-            return res.status_code, res.json()
+            res = res.json()
+            return res['status'], res
         else:
             return res.status_code, None
 
@@ -391,7 +325,8 @@ class RuntimeClient:
         }
         res = self._session.get(url, headers=self.headers, params=payload)
         if res.status_code == 200:
-            return res.status_code, res.json()
+            res = res.json()
+            return res['status'], res
         else:
             return res.status_code, None
 
@@ -410,7 +345,8 @@ class RuntimeClient:
         }
         res = self._session.get(url, headers=self.headers, params=payload)
         if res.status_code == 200:
-            return res.status_code, res.json()
+            res = res.json()
+            return res['status'], res
         else:
             return res.status_code, None
 

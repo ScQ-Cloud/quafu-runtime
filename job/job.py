@@ -10,7 +10,7 @@ from clients.runtime_client_ws import WebsocketClientCloseCode, RuntimeWebsocket
 from job.decoder import ResultDecoder
 from job.jobstatus import JOB_FINAL_STATES, JobStatus
 from rtexceptions.rtexceptions import ArgsException, JobNotFoundException, NotAuthorizedException, RunFailedException, \
-    RuntimeInvalidStateError, AsyncioWebsocketError
+    RuntimeInvalidStateError, AsyncioWebsocketError, CheckApiTokenError
 from clients.account import Account
 
 logger = logging.getLogger(__name__)
@@ -118,16 +118,15 @@ class Job:
             job_id=job_id,
             wait=wait
         )
+        if status_code == 201:
+            raise CheckApiTokenError("API_TOKEN ERROR.") from None
         if status_code == 404:
             raise JobNotFoundException(
                 f"Job not found: {job_id}"
             ) from None
-        elif status_code == 405:
-            raise NotAuthorizedException(
-                f"You are not the owner of Job:{job_id}"
-            )from None
         elif status_code != 200:
             raise RunFailedException(f"Failed to get result: {job_id}") from None
+        response = response['data']
         # self._result = response[]
         self._result = response['result']
         self._status = self._status_map[response['status']]
@@ -166,7 +165,7 @@ class Job:
             raise RuntimeInvalidStateError(
                 "A callback function is already streaming results."
             )
-        self._ws_client_future = self._executor.submit(self._start_websocket_client)
+        self._executor.submit(self._start_websocket_client)
         self._stream_results(
             result_queue=self._result_queue,
             user_callback=callback,
@@ -222,12 +221,14 @@ class Job:
         _decoder = decoder or self._interim_result_decoder
         while True:
             try:
-                response = result_queue.get()
+                response = result_queue.get(timeout=1)
                 if response == self._POISON_PILL:
                     self._empty_result_queue(result_queue)
                     print("Interim result streaming finished")
                     return
                 user_callback(self.job_id(), _decoder.decode(response))
+            except queue.Empty:
+                pass
             except Exception:  # pylint: disable=broad-except
                 logger.warning(
                     "An error occurred while streaming results " "for job %s:\n%s",
@@ -260,17 +261,25 @@ class Job:
             raise ArgsException("job_id is needed.")
         job_id = self.job_id()
         status_code, response = self._client.job_cancel(job_id=job_id)
+        # check api_token error
+        if status_code == 201:
+            raise CheckApiTokenError("API_TOKEN ERROR.") from None
         if status_code == 404:
             raise JobNotFoundException(
                 f"Job not found: {job_id}"
             ) from None
-        elif status_code == 405:
+        elif status_code == 403:
             raise NotAuthorizedException(
                 f"You are not the owner of Job:{job_id}"
             )from None
         elif status_code != 200:
             raise RunFailedException(f"Failed to cancel job: {job_id}") from None
-        self._status = self._status_map[response['status']]
+        response = response['data']
+        if response['status'] != -1:
+            self._status = self._status_map[response['status']]
+            response['status'] = self._status
+        else:
+            print("Job cancel failed")
         self.interim_result_cancel()
         return response
 
@@ -283,21 +292,23 @@ class Job:
             return self._status
         job_id = self._job_id
         status_code, response = self._client.job_status(job_id=job_id)
+        if status_code == 201:
+            raise CheckApiTokenError("API_TOKEN ERROR.") from None
         if status_code == 404:
             raise JobNotFoundException(
                 f"Job not found: {job_id}"
             ) from None
-        elif status_code == 403:
-            raise NotAuthorizedException(
-                f"You are not the owner of Job:{job_id}"
-            )from None
         elif status_code != 200:
             raise RunFailedException(f"Failed to get job: {job_id} status") from None
+        response = response['data']
         self._status = self._status_map[response['status']]
         self._result = response['result']
+        self._finish_time = response['finished_time']
         if self._status == JobStatus.ERROR:
             self._error_msg = self._result
-        self._finish_time = response['finished_time']
+            self._result = None
+        if response['status'] < 2:
+            self._finish_time = None
         print(f"Job status: {self._status}")
         return self._status
 
@@ -311,16 +322,15 @@ class Job:
             raise ArgsException("job_id is needed.")
         job_id = self.job_id()
         status_code, response = self._client.job_logs(job_id=job_id)
+        if status_code == 201:
+            raise CheckApiTokenError("API_TOKEN ERROR.") from None
         if status_code == 404:
             raise JobNotFoundException(
                 f"Job not found: {job_id}"
             ) from None
-        elif status_code == 403:
-            raise NotAuthorizedException(
-                f"You are not the owner of Job:{job_id}"
-            )from None
         elif status_code != 200:
             raise RunFailedException(f"Failed to get job: {job_id} logs") from None
+        response = response['data']
         self._status = self._status_map[response['status']]
         self._logs = response['logs']
         print(f"Job status: {self._status}")
@@ -337,6 +347,8 @@ class Job:
             return False
         job_id = self._job_id
         status_code, response = self._client.job_delete(job_id=job_id)
+        if status_code == 201:
+            raise CheckApiTokenError("API_TOKEN ERROR.") from None
         if status_code == 404:
             raise JobNotFoundException(
                 f"Job not found: {job_id}"
@@ -347,13 +359,14 @@ class Job:
             )from None
         elif status_code != 200:
             raise RunFailedException(f"Failed to get job: {job_id} logs") from None
+        response = response['data']
         self._status = self._status_map[response['status']]
-        deled = response['deled']
-        err = response['err']
+        deleted = response['deleted']
+        err = None
         if response['status'] < 2:
             err = "job is running"
-        print(f"Job deleted: {deled}, error msg: {err}")
-        return deled
+        print(f"Job deleted: {deleted}, Error: {err}")
+        return deleted
 
     def program_id(self):
         """Return program id."""

@@ -100,3 +100,7 @@ class RuntimeInvalidStateError(ClientExceptions):
 
 class AsyncioWebsocketError(ClientExceptions):
     """Error raised when Async websocket client failed."""
+
+
+class CheckApiTokenError(ClientExceptions):
+    """Error raised when api_token is wrong."""
