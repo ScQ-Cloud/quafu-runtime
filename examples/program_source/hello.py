@@ -24,16 +24,6 @@ def run(task, userpub, params):
     """The entry point of the program.
     Make sure the first and the second arg of `run` is `task` and `userpub`.
 
-    Args:
-        task(quafu.task): task instance used to run a circuit.
-        userpub(quafu_runtime.program.userpub): UserPub instance used to publish interim result.
-        params: User inputs.
-
-    Returns:
-        Final result of the program.
-
-    The result and your interim result will be jsonfy before send to client,
-    so you should encode your data to `bytes`, and decode it when you get it
     """
     q = prepare_circuits()
     simu_res = simulate(q)

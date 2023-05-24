@@ -4,8 +4,9 @@ from utils.jsonutil import to_base64_string, from_base64_string
 from typing import Optional, Union, Dict, Any
 from rtexceptions.rtexceptions import *
 from clients.account import Account
+from program.program import RuntimeProgram
 from clients.runtime_client import RuntimeClient
-from job.job import Job
+from job.job import RuntimeJob
 from utils.check_python import check
 
 
@@ -51,6 +52,8 @@ class RuntimeService:
     The :meth:`run` method returns a
     :class:`RuntimeJob` object. You can use its methods to perform tasks like checking job status, getting job result, and
     canceling job.
+
+    See more message about program templates in quafu_runtime.program.template
     """
 
     def __init__(self,
@@ -195,12 +198,25 @@ class RuntimeService:
             ) from None
         elif status != 200:
             raise UploadException(f"Failed to fetch program: Unkown Error.") from None
+        program = RuntimeProgram(program_id=program_id)
         response = response['data']
-        response['data'] = from_base64_string(response['data']).decode("utf-8")
+        if 'data' in response:
+            response['data'] = from_base64_string(response['data']).decode("utf-8")
+            program.data = response['data']
+        if 'description' in response:
+            program.description = response['description']
+        if 'name' in response:
+            program.name = response['name']
+        if 'is_public' in response:
+            program.is_public = response['is_public']
+        if 'backend' in response:
+            program.backend = response['backend']
+        if 'cost' in response:
+            program.max_cost_time = response['cost']
         if self._programs is None:
             self._programs = {}
         self._programs[program_id] = response
-        return response
+        return program
 
     def upload_program(self,
                        data: str,
@@ -374,7 +390,7 @@ class RuntimeService:
             program_id: str = None,
             name: str = None,
             backend: str = None,
-            inputs: dict = None) -> Job:
+            inputs: dict = None) -> RuntimeJob:
         """
         Run a program on the server.
 
@@ -419,7 +435,7 @@ class RuntimeService:
             backend = response["backend"]
         if program_id is None:
             program_id = response["program_id"]
-        job = Job(
+        job = RuntimeJob(
             account=self._account,
             status=response["status"],
             backend=backend,

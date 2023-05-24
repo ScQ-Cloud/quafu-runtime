@@ -2,13 +2,13 @@ import datetime
 import os
 import time
 from time import sleep
-
-from clients.account import Account
-from job.job import Job
-from quafu_runtime_service import RuntimeService
+from .clients.account import Account
+from .job.job import RuntimeJob
+from quafu_runtime.quafu_runtime_service import RuntimeService
 
 API_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MTI3MiwiZXhwIjoxNjg1MTY0MjM1fQ.BuTKgSuvxjrZcgV8YmmkNScGvdQfrYbHphEMxI9n7p8"
 API_TOKEN = API_TOKEN[::-1]
+
 
 class TestAPI:
     @staticmethod
@@ -16,13 +16,13 @@ class TestAPI:
         account = Account(api_token=API_TOKEN)
         service = RuntimeService(account)
         metadata = {"name": "for-while", "backend": "testbackend"}
-        id2 = service.upload_program(data='program/for-while.py', metadata=metadata)
+        id2 = service.upload_program(data='program/examples/for-while.py', metadata=metadata)
         metadata = {"name": "hello", "backend": "testbackend"}
-        id1 = service.upload_program(data='program/hello.py', metadata=metadata)
+        id1 = service.upload_program(data='program/examples/hello.py', metadata=metadata)
         metadata = {"name": "raise-exception", "backend": "testbackend"}
-        id3 = service.upload_program(data='program/raise-exception.py', metadata=metadata)
+        id3 = service.upload_program(data='program/examples/raise-exception.py', metadata=metadata)
         metadata = {"name": "long-run-task", "backend": "testbackend"}
-        id4 = service.upload_program(data='program/long-run-task.py', metadata=metadata)
+        id4 = service.upload_program(data='program/examples/long-run-task.py', metadata=metadata)
         print('id1:', id1)
         print('id2:', id2)
         print('id3:', id3)
@@ -34,7 +34,7 @@ class TestAPI:
         service = RuntimeService(account)
         for i in range(num):
             metadata = {"name": "testname" + str(i + 10), "backend": "testbackend"}
-            program_id = service.upload_program(data='program/hello.py', metadata=metadata)
+            program_id = service.upload_program(data='program/examples/hello.py', metadata=metadata)
             print(program_id)
 
     @staticmethod
@@ -56,7 +56,7 @@ class TestAPI:
         account = Account(api_token=API_TOKEN)
         service = RuntimeService(account)
         service.update_program(program_id='3eaeb8960d22487abd6d8b4b91f40461',
-                               data='program/raise-exception.py',
+                               data='program/examples/raise-exception.py',
                                is_public=True,
                                description='The program is created by QuaFu')
         # service.program()
@@ -66,7 +66,7 @@ class TestAPI:
         account = Account(api_token=API_TOKEN)
         service = RuntimeService(account)
         metadata = {"name": "program_with_error", "backend": "testbackend"}
-        service.upload_program(data='program/program_with_error.py',
+        service.upload_program(data='program/examples/program_with_error.py',
                                metadata=metadata)
 
     @staticmethod
@@ -116,6 +116,7 @@ class TestAPI:
         print(job.job_id())
         print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         print(job.result(wait=True))
+        print(job.logs())
 
     @staticmethod
     def TestWebsockets():
@@ -126,9 +127,6 @@ class TestAPI:
         # job.interim_result_cancel()
         print(job.result(wait=True))
 
-    def TestJob(self):
-        job = Job()
-
 def callback(job_id, message):
     print(f"job_id:{job_id}, message:{message}")
 
@@ -136,7 +134,7 @@ def callback(job_id, message):
 if __name__ == '__main__':
     print(os.getcwd())
     # TestAPI.TestRun()
-    # TestAPI.TestJob_wait()
+    TestAPI.TestJob_wait()
     # TestAPI.TestJob_nowait()
     # TestAPI.parallelTest(num=5)
     # TestAPI.TestGetPrograms()
@@ -149,4 +147,4 @@ if __name__ == '__main__':
     # job.cancel()
     # TestAPI.TestJob_wait()
     # TestAPI.TestCheckSourceCode()
-    TestAPI.TestWebsockets()
+    # TestAPI.TestWebsockets()

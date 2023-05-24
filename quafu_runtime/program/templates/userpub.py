@@ -8,7 +8,8 @@ class UserPub:
     def publish(self, message: bytes):
         """Publish message to client.
 
-        arg message must be bytes type, so you should convert your data to bytes before publish it. Or it will raise exception and the job will fail.
+        Arg message must be bytes type, so you should convert your data to bytes before publish it.
+        Or it will raise exception and the job will fail.
 
         Args:
             message: Msg user want to publish when running.

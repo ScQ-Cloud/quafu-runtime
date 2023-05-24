@@ -16,7 +16,7 @@ from clients.account import Account
 logger = logging.getLogger(__name__)
 
 
-class Job:
+class RuntimeJob:
     """Class represent a job instance running on runtime server.
 
     A new `Job` instance is returned when you call
