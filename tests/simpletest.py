@@ -2,8 +2,8 @@ import datetime
 import os
 import time
 from time import sleep
-from .clients.account import Account
-from .job.job import RuntimeJob
+from quafu_runtime.clients.account import Account
+from quafu_runtime.job.job import RuntimeJob
 from quafu_runtime.quafu_runtime_service import RuntimeService
 
 API_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MTI3MiwiZXhwIjoxNjg1MTY0MjM1fQ.BuTKgSuvxjrZcgV8YmmkNScGvdQfrYbHphEMxI9n7p8"
@@ -16,13 +16,13 @@ class TestAPI:
         account = Account(api_token=API_TOKEN)
         service = RuntimeService(account)
         metadata = {"name": "for-while", "backend": "testbackend"}
-        id2 = service.upload_program(data='program/examples/for-while.py', metadata=metadata)
+        id2 = service.upload_program(data='examples/program_source/for-while.py', metadata=metadata)
         metadata = {"name": "hello", "backend": "testbackend"}
-        id1 = service.upload_program(data='program/examples/hello.py', metadata=metadata)
+        id1 = service.upload_program(data='examples/program_source/hello.py', metadata=metadata)
         metadata = {"name": "raise-exception", "backend": "testbackend"}
-        id3 = service.upload_program(data='program/examples/raise-exception.py', metadata=metadata)
+        id3 = service.upload_program(data='examples/program_source/raise-exception.py', metadata=metadata)
         metadata = {"name": "long-run-task", "backend": "testbackend"}
-        id4 = service.upload_program(data='program/examples/long-run-task.py', metadata=metadata)
+        id4 = service.upload_program(data='examples/program_source/long-run-task.py', metadata=metadata)
         print('id1:', id1)
         print('id2:', id2)
         print('id3:', id3)
@@ -34,7 +34,7 @@ class TestAPI:
         service = RuntimeService(account)
         for i in range(num):
             metadata = {"name": "testname" + str(i + 10), "backend": "testbackend"}
-            program_id = service.upload_program(data='program/examples/hello.py', metadata=metadata)
+            program_id = service.upload_program(data='examples/program_source/hello.py', metadata=metadata)
             print(program_id)
 
     @staticmethod
@@ -56,7 +56,7 @@ class TestAPI:
         account = Account(api_token=API_TOKEN)
         service = RuntimeService(account)
         service.update_program(program_id='3eaeb8960d22487abd6d8b4b91f40461',
-                               data='program/examples/raise-exception.py',
+                               data='examples/program_source/raise-exception.py',
                                is_public=True,
                                description='The program is created by QuaFu')
         # service.program()
@@ -66,7 +66,7 @@ class TestAPI:
         account = Account(api_token=API_TOKEN)
         service = RuntimeService(account)
         metadata = {"name": "program_with_error", "backend": "testbackend"}
-        service.upload_program(data='program/examples/program_with_error.py',
+        service.upload_program(data='examples/program_source/program_with_error.py',
                                metadata=metadata)
 
     @staticmethod
