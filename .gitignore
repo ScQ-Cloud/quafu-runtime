@@ -1,3 +1,6 @@
 __pycache__*
 .idea
 *temp
+dist/
+quafu_runtime.egg-info/
+build/
