@@ -1,17 +1,15 @@
-import asyncio
 import logging
 import queue
 import traceback
 from concurrent import futures
 from typing import Optional, Callable, Type
-
-from clients.runtime_client import RuntimeClient
-from clients.runtime_client_ws import WebsocketClientCloseCode, RuntimeWebsocketClient
-from job.decoder import ResultDecoder
-from job.jobstatus import JOB_FINAL_STATES, JobStatus
-from rtexceptions.rtexceptions import ArgsException, JobNotFoundException, NotAuthorizedException, RunFailedException, \
-    RuntimeInvalidStateError, AsyncioWebsocketError, CheckApiTokenError
-from clients.account import Account
+from ..clients.runtime_client import RuntimeClient
+from ..clients.runtime_client_ws import WebsocketClientCloseCode, RuntimeWebsocketClient
+from ..job.decoder import ResultDecoder
+from ..job.jobstatus import JOB_FINAL_STATES, JobStatus
+from ..rtexceptions.rtexceptions import ArgsException, JobNotFoundException, NotAuthorizedException, RunFailedException, \
+    RuntimeInvalidStateError, CheckApiTokenError
+from ..clients.account import Account
 
 logger = logging.getLogger(__name__)
 

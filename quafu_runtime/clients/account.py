@@ -1,15 +1,15 @@
 import os
 
-from quafu_runtime.rtexceptions.rtexceptions import UserException
-from quafu_runtime.utils.base import get_homedir
+from ..rtexceptions.rtexceptions import UserException
+from ..utils.base import get_homedir
 
 
 class Account:
-    """
-    Class of Account.
+    """Class of Account.
 
     Attributes:
-        token:  Apitoken that associate to your Quafu account. If not provided, load locally.
+        _token:  Api_token that associate to your Quafu account. If not provided, load locally.
+
     """
     def __init__(self,
                  api_token: str = None):

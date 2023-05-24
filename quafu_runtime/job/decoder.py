@@ -1,7 +1,6 @@
-"""Qiskit runtime job result decoder."""
-
 import json
-from typing import Any, Dict, Tuple
+from typing import Any
+
 
 class ResultDecoder:
     """Runtime job result decoder.

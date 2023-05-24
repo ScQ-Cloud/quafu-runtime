@@ -1,6 +1,5 @@
 import sys
 import _ast
-
 from pyflakes import checker, __version__
 from pyflakes import reporter as modReporter
 from pyflakes import messages
@@ -23,6 +22,8 @@ PYFLAKES_ERROR_MESSAGES = [
     messages.ImportStarNotPermitted,
     messages.ImportStarUsed
 ]
+
+
 def check(codeString, filename, reporter=None):
     """
     Check the Python source given by C{codeString} for flakes.
@@ -51,4 +52,3 @@ def check(codeString, filename, reporter=None):
             reporter.flake(message)
     if count > 0:
         raise Exception(f"Error occurred, please fix it first, Total errors: {count}")
-

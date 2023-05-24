@@ -1,13 +1,12 @@
 import warnings
-
-from utils.jsonutil import to_base64_string, from_base64_string
+from .utils.jsonutil import to_base64_string, from_base64_string
 from typing import Optional, Union, Dict, Any
-from rtexceptions.rtexceptions import *
-from clients.account import Account
-from program.program import RuntimeProgram
-from clients.runtime_client import RuntimeClient
-from job.job import RuntimeJob
-from utils.check_python import check
+from .rtexceptions.rtexceptions import *
+from .clients.account import Account
+from .program.program import RuntimeProgram
+from .clients.runtime_client import RuntimeClient
+from .job.job import RuntimeJob
+from .utils.check_python import check
 
 
 class RuntimeService:

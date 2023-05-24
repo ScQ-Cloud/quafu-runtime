@@ -6,9 +6,9 @@ from abc import ABC
 from typing import Optional, Any
 from queue import Queue
 from websocket import WebSocketApp, STATUS_ABNORMAL_CLOSED, STATUS_NORMAL
-from rtexceptions.rtexceptions import WebsocketError, WebsocketTimeoutError
+from ..rtexceptions.rtexceptions import WebsocketError, WebsocketTimeoutError
 
-from clients.account import Account
+from ..clients.account import Account
 
 logger = logging.getLogger(__name__)
 
