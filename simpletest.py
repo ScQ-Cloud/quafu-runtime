@@ -2,9 +2,9 @@ import datetime
 import os
 import time
 from time import sleep
-from quafu_runtime.clients.account import Account
-from quafu_runtime.job.job import RuntimeJob
-from quafu_runtime.quafu_runtime_service import RuntimeService
+from clients.account import Account
+from job.job import RuntimeJob
+from quafu_runtime_service import RuntimeService
 
 API_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MTI3MiwiZXhwIjoxNjg1MTY0MjM1fQ.BuTKgSuvxjrZcgV8YmmkNScGvdQfrYbHphEMxI9n7p8"
 API_TOKEN = API_TOKEN[::-1]
@@ -134,10 +134,10 @@ def callback(job_id, message):
 if __name__ == '__main__':
     print(os.getcwd())
     # TestAPI.TestRun()
-    TestAPI.TestJob_wait()
+    # TestAPI.TestJob_wait()
     # TestAPI.TestJob_nowait()
     # TestAPI.parallelTest(num=5)
-    # TestAPI.TestGetPrograms()
+    TestAPI.TestGetPrograms()
     # TestAPI.TestGetProgram()
     # TestAPI.TestUpload()
     # TestAPI.TestUploadMore(10)
