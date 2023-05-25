@@ -45,7 +45,7 @@ setuptools.setup(
         "Topic :: Scientific/Engineering",
     ],
     keywords='quafu sdk api runtime quantum',
-    packages=setuptools.find_packages(exclude=["tests", "*test*", "tests*"]),
+    packages=setuptools.find_packages(exclude=["tests", "*test*", "tests*", "*test"]),
     include_package_data=True,
     python_requires=">=3.8",
     zip_safe=False,
@@ -53,5 +53,4 @@ setuptools.setup(
     #     "Documentation": "",
     #     "Source Code": ""
     # }
-
 )
