@@ -50,6 +50,8 @@ service.list_programs()
 ### Executing your program
 
 ```python
+from quafu_runtime import RuntimeService
+service = RuntimeService()
 job = service.run(program_id = "<your program id>",params = "<parameters of program>")
 print(f"job ID: {job.job_id()}")
 ```
@@ -68,7 +70,7 @@ The result is the data returned by your program.
 
 ## Document
 
-If you want know more features about Runtime, Please see the website [docs](https://scq-cloud.github.io/).
+If you want to learn more features about Runtime, Please see the website [docs](https://scq-cloud.github.io/).
 
 
 
