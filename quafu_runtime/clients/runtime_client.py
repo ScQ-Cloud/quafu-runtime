@@ -19,7 +19,7 @@ class RuntimeClient:
         self._token = token
         self._url = url + "/runtime"
         self._session = requests.session()
-        self.headers = {'Content-Type': 'application/json;charset=UTF-8', 'api_token': self._token}
+        self.headers = {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8', 'api_token': self._token}
 
     def program_upload(self,
                        program_data: str,

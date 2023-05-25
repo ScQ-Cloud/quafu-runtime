@@ -28,7 +28,7 @@ class RuntimeService:
         print(id1)
 
         # Run a program
-        job1 = service.run(name='long-run-task',inputs={'TestParam':'xxxxxx'})
+        job1 = service.run(name='long-run-task',params={'TestParam':'xxxxxx'})
 
         # Define callback function
         def callback(job_id, message):
@@ -56,7 +56,7 @@ class RuntimeService:
     """
 
     def __init__(self,
-                 account: Account):
+                 account: Account=None):
         """QiskitRuntimeService constructor
 
         Args:
@@ -65,6 +65,8 @@ class RuntimeService:
         Returns:
             An instance of service.
         """
+        if account is None:
+            account = Account()
         self._account = account
         self._url = account.get_url()
         self._token = account.get_token()
@@ -126,7 +128,7 @@ class RuntimeService:
                     limit=fetch_page_limit, skip=offset
                 )
                 if status == 201:
-                    raise CheckApiTokenError("API_TOKEN ERROR.") from None
+                    raise CheckApiTokenError("API_TOKEN ERROR.", response['message']) from None
                 elif status == 405:
                     raise ArgsException(
                         "Limit or offset is wrong or not provided."
@@ -389,15 +391,15 @@ class RuntimeService:
             program_id: str = None,
             name: str = None,
             backend: str = None,
-            inputs: dict = None) -> RuntimeJob:
+            params: dict = None) -> RuntimeJob:
         """
         Run a program on the server.
 
         Args:
             program_id: Program ID.
             name: Optional, use it to find Program ID.
-            backend: Optional, it will be used in the program.
-            inputs: Program input parameters. These input values are passed
+            backend: Optional, it will be used in the program. It's useless up to now.
+            params: Program input parameters. These input values are passed
                 to the runtime program.
 
         Returns:
@@ -411,7 +413,7 @@ class RuntimeService:
             program_id=program_id,
             name=name,
             backend=backend,
-            params=inputs,
+            params=params,
         )
         if status_code == 201:
             raise CheckApiTokenError("API_TOKEN ERROR") from None
@@ -421,7 +423,7 @@ class RuntimeService:
             ) from None
         elif status_code == 401:
             raise InputValueException(
-                f"params of run is invalid:{inputs}"
+                f"params of run is invalid:{params}"
             )from None
         elif status_code == 405:
             raise ProgramNotValidException(
@@ -442,7 +444,7 @@ class RuntimeService:
             job_id=response["job_id"],
             creation_date=response["creation_time"],
             program_id=program_id,
-            params=inputs,
+            params=params,
         )
         print(f'job created, job_id is {job.job_id()}')
         return job

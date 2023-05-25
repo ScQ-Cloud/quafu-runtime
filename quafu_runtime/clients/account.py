@@ -23,9 +23,10 @@ class Account:
         else:
             self._token = api_token
             # self._url = "http://quafu.baqis.ac.cn/"
-            self._url = "http://192.168.220.55:5000/"
-            self._url_ws = "ws://192.168.220.55:8765"
-
+            self._url = "http://58.205.216.42:5050/"
+            self._url_ws = "ws://58.205.216.42:8760"
+            # self._url = "http://192.168.220.55:5050/"
+            # self._url_ws = "ws://192.168.220.55:8760"
     def save_api_token(self,
                        api_token: str):
         """Save your api_token that associates your quafu account.

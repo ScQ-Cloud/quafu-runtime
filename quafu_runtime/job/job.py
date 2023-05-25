@@ -40,8 +40,8 @@ class RuntimeJob:
     _executor = futures.ThreadPoolExecutor(thread_name_prefix="runtime_job")
 
     def __init__(self,
-                 account: Account,
                  job_id: str,
+                 account: Account = None,
                  status: int = 0,
                  api_client: RuntimeClient = None,
                  backend: str = None,
@@ -66,6 +66,8 @@ class RuntimeJob:
         Returns:
             An instance of job.
         """
+        if account is None:
+            account = Account()
         self._job_id = job_id
         self._client = api_client
         if self._client is None:

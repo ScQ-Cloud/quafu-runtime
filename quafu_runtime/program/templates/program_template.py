@@ -24,7 +24,7 @@ def prepare_circuits():
 def run(task, userpub, params):
     """The entry point of the program.
 
-    Make sure the first and the second arg of `run` is `task` and `userpub`.
+    Make sure the arguments of `run` is `task`, `userpub` and `params`.
 
     Args:
         task(pyquafu.Task): task instance used to run a circuit.
