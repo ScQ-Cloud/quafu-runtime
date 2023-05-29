@@ -19,7 +19,7 @@ class RuntimeClient:
         self._token = token
         self._url = url + "/runtime"
         self._session = requests.session()
-        self.headers = {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8', 'api_token': self._token}
+        self.headers = {'Content-Type': 'application/json;charset=UTF-8', 'apitoken': self._token}
 
     def program_upload(self,
                        program_data: str,
@@ -129,9 +129,9 @@ class RuntimeClient:
         res = self._session.delete(url, headers=self.headers, params={'program_id': program_id})
         if res.status_code == 200:
             res = res.json()
-            return res['status']
+            return res['status'], res
         else:
-            return res.status_code
+            return res.status_code, None
 
     def program_run(self,
                     program_id: str = None,

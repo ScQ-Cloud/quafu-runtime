@@ -59,7 +59,7 @@ class RuntimeWebsocketClient(ABC):
         self._access_token = account.get_token()
         self._job_id = job_id
         self._message_queue = message_queue
-        self._header = {'api_token': self._access_token, 'job_id': self._job_id}
+        self._header = {'apitoken': self._access_token, 'jobid': self._job_id}
         self._ws: Optional[WebSocketApp] = None
         self._authenticated = False
         self._cancelled = False

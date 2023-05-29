@@ -41,7 +41,7 @@ class Account:
             os.mkdir(file_dir)
         with open(file_dir + "api", "w") as f:
             f.write(self._token + "\n")
-            f.write("http://quafu.baqis.ac.cn/")
+            # f.write("http://quafu.baqis.ac.cn/")
 
     def load_account(self) -> None:
         """Load your Quafu account."""
@@ -51,7 +51,7 @@ class Account:
             f = open(file_dir + "api", "r")
             data = f.readlines()
             self._token = data[0].strip("\n")
-            self._url = data[1].strip("\n")
+            # self._url = data[1].strip("\n")
         except Exception as e:
             raise UserException(f"User configure error. Please set up your token. Error: {str(e)}")
 
