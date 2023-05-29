@@ -165,11 +165,15 @@ class RuntimeJob:
             raise RuntimeInvalidStateError(
                 "A callback function is already streaming results."
             )
-        self._executor.submit(self._start_websocket_client)
-        self._stream_results(
-            result_queue=self._result_queue,
-            user_callback=callback,
-            decoder=decoder,)
+        self._ws_client_future = self._executor.submit(self._start_websocket_client)
+        # self._stream_results(
+        #     result_queue=self._result_queue,
+        #     user_callback=callback,
+        #     decoder=decoder,)
+        self._executor.submit(self._stream_results,
+                              result_queue=self._result_queue,
+                              user_callback=callback,
+                              decoder=decoder,)
 
     def _is_streaming(self) -> bool:
         """Return whether job results are being streamed.
