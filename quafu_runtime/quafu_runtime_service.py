@@ -90,6 +90,9 @@ class RuntimeService:
             skip: The number of programs to skip.
         """
         programs = self.programs(refresh=refresh, limit=limit, skip=skip)
+        if programs is None:
+            print("No programs")
+            return
         for prog in programs:
             print("-" * 50)
             if detailed:
@@ -184,7 +187,7 @@ class RuntimeService:
             program_id=program_id, name=name
         )
         if status == 201:
-            raise CheckApiTokenError("API_TOKEN ERROR.") from None
+            raise CheckApiTokenError("API_TOKEN ERROR.", response['message']) from None
         if status == 403:
             raise NotAuthorizedException(
                 "You are not authorized to get program."
@@ -203,17 +206,7 @@ class RuntimeService:
         response = response['data']
         if 'data' in response:
             response['data'] = from_base64_string(response['data']).decode("utf-8")
-            program.data = response['data']
-        if 'description' in response:
-            program.description = response['description']
-        if 'name' in response:
-            program.name = response['name']
-        if 'is_public' in response:
-            program.is_public = response['is_public']
-        if 'backend' in response:
-            program.backend = response['backend']
-        if 'cost' in response:
-            program.max_cost_time = response['cost']
+        program.update(response)
         if self._programs is None:
             self._programs = {}
         self._programs[program_id] = response
@@ -263,7 +256,7 @@ class RuntimeService:
             program_data=program_data, **program_metadata
         )
         if status_code == 201:
-            raise CheckApiTokenError("API_TOKEN ERROR.") from None
+            raise CheckApiTokenError("API_TOKEN ERROR.", response['message']) from None
         if status_code == 409:
             raise DuplicateProgramException(
                 "Program with the same name already exists."
@@ -273,7 +266,7 @@ class RuntimeService:
                 "You have not provide enough args."
             ) from None
         elif status_code != 200:
-            raise UploadException(f"Failed to create program: Unkown Error.") from None
+            raise UploadException(f"Failed to upload program: Unkown Error.") from None
         response = response['data']
         return response["id"]
 
@@ -352,7 +345,7 @@ class RuntimeService:
             program_id=program_id, program_data=data, **combined_metadata
         )
         if status_code == 201:
-            raise CheckApiTokenError("API_TOKEN ERROR.") from None
+            raise CheckApiTokenError("API_TOKEN ERROR.", response['message']) from None
         elif status_code == 404:
             raise ProgramNotFoundException(
                 f"Program not found: {program_id}"
@@ -360,8 +353,11 @@ class RuntimeService:
         elif status_code != 200:
             raise UpdateException(f"Failed to update program: Unkown Error.") from None
         response = response['data']
-        response['data'] = from_base64_string(response['data']).decode("utf-8")
-        print("After update, the program is:\n", response)
+        program = RuntimeProgram(program_id=program_id)
+        if 'data' in response:
+            response['data'] = from_base64_string(response['data']).decode("utf-8")
+        program.update(response)
+        print("After update, the program is:\n", program)
         if self._programs is None:
             self._programs = {}
         self._programs[program_id] = response
@@ -373,9 +369,9 @@ class RuntimeService:
             Args:
                 program_id: Program ID.
         """
-        status_code = self._client.program_delete(program_id=program_id)
+        status_code, response = self._client.program_delete(program_id=program_id)
         if status_code == 201:
-            raise CheckApiTokenError("API_TOKEN ERROR.") from None
+            raise CheckApiTokenError("API_TOKEN ERROR.", response['message']) from None
         if status_code == 404:
             raise ProgramNotFoundException(
                 f"Program not found: {program_id}"
@@ -416,7 +412,7 @@ class RuntimeService:
             params=params,
         )
         if status_code == 201:
-            raise CheckApiTokenError("API_TOKEN ERROR") from None
+            raise CheckApiTokenError("API_TOKEN ERROR", response['message']) from None
         elif status_code == 404:
             raise ProgramNotFoundException(
                 f"Program not found: {program_id} name:{name}"
