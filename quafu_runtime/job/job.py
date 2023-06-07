@@ -148,9 +148,8 @@ class RuntimeJob:
 
         Args:
             callback: Callback function to be invoked for any interim results and final result.
-                The callback function will receive 2 positional parameters:
-                    1. Job ID
-                    2. Job result data.
+                The callback function will receive 1 parameters:
+                    1. Job result data.
             decoder: A :class:`decoder.ResultDecoder` subclass used to decode job results and interim result.
                 The result will be jsonfy before send to client,
                 so you should encode your data, and decode it with `decoder` when you get it.
@@ -230,7 +229,7 @@ class RuntimeJob:
                     self._empty_result_queue(result_queue)
                     print("Interim result streaming finished")
                     return
-                user_callback(self.job_id(), _decoder.decode(response))
+                user_callback(_decoder.decode(response))
             except queue.Empty:
                 pass
             except Exception:  # pylint: disable=broad-except

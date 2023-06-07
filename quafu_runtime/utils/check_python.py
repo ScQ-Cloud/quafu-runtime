@@ -48,7 +48,7 @@ def check(codeString, filename, reporter=None):
     for message in w.messages:
         if message.__class__ in PYFLAKES_ERROR_MESSAGES:
             count += 1
-            print("Error:")
+            print("Source Code Error:")
             reporter.flake(message)
     if count > 0:
         raise Exception(f"Error occurred, please fix it first, Total errors: {count}")
