@@ -30,7 +30,7 @@ def run(task: Task, userpub, params):
     q = prepare_circuits()
     user = User()
     user.save_apitoken("8DYvWR-jo79XuHucr8LWUYxuR845fxEuxCB_So-AR_v.QfwYTOygzN4gjNxojIwhXZiwyM2ITM6ICZpJye.9JCVXpkI6ICc5RnIsIiN1IzUIJiOicGbhJye")
-    task.load_account()
+    user.load_account()
     task.config(backend="ScQ-P10", shots=100, compile=True)
 
     for i in range(10):
