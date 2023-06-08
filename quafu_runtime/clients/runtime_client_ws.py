@@ -59,7 +59,7 @@ class RuntimeWebsocketClient(ABC):
         self._access_token = account.get_token()
         self._job_id = job_id
         self._message_queue = message_queue
-        self._header = {'apitoken': self._access_token, 'jobid': self._job_id}
+        self._header = {'api_token': self._access_token, 'job_id': self._job_id}
         self._ws: Optional[WebSocketApp] = None
         self._authenticated = False
         self._cancelled = False
@@ -204,7 +204,7 @@ class RuntimeWebsocketClient(ABC):
 
                 if self._client_close_code == WebsocketClientCloseCode.TIMEOUT:
                     raise WebsocketTimeoutError(
-                        "Timeout reached while getting job status."
+                        "Timeout reached while getting job interim_result."
                     ) from None
 
                 if self._server_close_code == STATUS_NORMAL and self._error is None:

@@ -194,7 +194,7 @@ class RuntimeService:
             ) from None
         elif status == 404:
             raise ProgramNotFoundException(
-                f"Program not found: program_id:{program_id}, name:{name}"
+                f"Program not found: program_id:{program_id}, Name:{name}"
             ) from None
         elif status == 405:
             raise ArgsException(
@@ -415,7 +415,7 @@ class RuntimeService:
             raise CheckApiTokenError("API_TOKEN ERROR", response['message']) from None
         elif status_code == 404:
             raise ProgramNotFoundException(
-                f"Program not found: {program_id} name:{name}"
+                f"Program not found: {program_id}; Name:{name}"
             ) from None
         elif status_code == 401:
             raise InputValueException(
