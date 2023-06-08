@@ -2,7 +2,7 @@ from time import sleep
 import numpy as np
 from quafu import QuantumCircuit
 from quafu import simulate
-from quafu import User, Task
+from quafu import Task
 """A sample runtime program called hello-world that submits random circuits."""
 
 
@@ -28,14 +28,16 @@ def run(task: Task, userpub, params):
 
     """
     q = prepare_circuits()
-    user = User()
-    user.save_apitoken("8DYvWR-jo79XuHucr8LWUYxuR845fxEuxCB_So-AR_v.QfwYTOygzN4gjNxojIwhXZiwyM2ITM6ICZpJye.9JCVXpkI6ICc5RnIsIiN1IzUIJiOicGbhJye")
-    user.load_account()
+    #user = User()
+    #user.save_apitoken("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MjcsImV4cCI6MTY4ODM1OTA4M30.lu2i_DFvu2HBb25u_aWTdaG7X4eoH51j1vfbYErx0_w")
+    #user.load_account()
     task.config(backend="ScQ-P10", shots=100, compile=True)
 
-    for i in range(10):
+    num_iter = 2
+
+    for i in range(num_iter):
         sleep(2)
-        res = task.send(q)
+        res = task.send(q, wait=False)
         print(f"Result of task #{i}: {res}")
 
     simu_res = simulate(q)
@@ -44,3 +46,8 @@ def run(task: Task, userpub, params):
         "num": simu_res.num,
         "probabilities": simu_res.probabilities.tolist(),
     }
+
+
+if __name__ == '__main__':
+    task = Task()
+    run(task, None, "")

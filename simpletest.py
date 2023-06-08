@@ -1,12 +1,15 @@
+import argparse
 import datetime
 import os
 import time
 from time import sleep
-from clients.account import Account
-from job.job import RuntimeJob
-from quafu_runtime_service import RuntimeService
+from quafu_runtime.clients.account import Account
+from quafu_runtime.job.job import RuntimeJob
+from quafu_runtime.quafu_runtime_service import RuntimeService
 
 API_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MTI3MiwiZXhwIjoxNjg1MTY0MjM1fQ.BuTKgSuvxjrZcgV8YmmkNScGvdQfrYbHphEMxI9n7p8"
+API_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MjcsImV4cCI6MTY4ODM1OTA4M30.lu2i_DFvu2HBb25u_aWTdaG7X4eoH51j1vfbYErx0_w"
+API_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTI2MywiZXhwIjoxNjg4ODgzNTQ2fQ.I32g0dsbHZ9MsTItTfjHDr-WPGBdaJKRg8hWAsnouwM"
 API_TOKEN = API_TOKEN[::-1]
 
 
@@ -15,18 +18,21 @@ class TestAPI:
     def TestUpload():
         account = Account(api_token=API_TOKEN)
         service = RuntimeService(account)
-        metadata = {"name": "for-while", "backend": "testbackend"}
-        id2 = service.upload_program(data='examples/program_source/for-while.py', metadata=metadata)
+        #metadata = {"name": "for-while", "backend": "testbackend"}
+        #id2 = service.upload_program(data='examples/program_source/for-while.py', metadata=metadata)
         metadata = {"name": "hello", "backend": "testbackend"}
         id1 = service.upload_program(data='examples/program_source/hello.py', metadata=metadata)
-        metadata = {"name": "raise-exception", "backend": "testbackend"}
-        id3 = service.upload_program(data='examples/program_source/raise-exception.py', metadata=metadata)
-        metadata = {"name": "long-run-task", "backend": "testbackend"}
-        id4 = service.upload_program(data='examples/program_source/long-run-task.py', metadata=metadata)
+        #metadata = {"name": "raise-exception", "backend": "testbackend"}
+        #id3 = service.upload_program(data='examples/program_source/raise-exception.py', metadata=metadata)
+        #metadata = {"name": "long-run-task", "backend": "testbackend"}
+        #id4 = service.upload_program(data='examples/program_source/long-run-task.py', metadata=metadata)
+        #metadata = {"name": "multi-task", "backend": "testbackend"}
+        #id5 = service.upload_program(data='examples/program_source/multi-task.py', metadata=metadata)
         print('id1:', id1)
-        print('id2:', id2)
-        print('id3:', id3)
-        print('id4:', id4)
+        #print('id2:', id2)
+        #print('id3:', id3)
+        #print('id4:', id4)
+        #print('id5:', id5)
 
     @staticmethod
     def TestUploadMore(num: int):
@@ -73,7 +79,7 @@ class TestAPI:
     def TestDelProgram():
         account = Account(api_token=API_TOKEN)
         service = RuntimeService(account)
-        service.delete_program(program_id='3eaeb8960d22487abd6d8b4b91f40461')
+        service.delete_program(program_id='8ca38b518f1546c89e9dec112b997e4b')
         # service.program()
 
     @staticmethod
@@ -112,7 +118,10 @@ class TestAPI:
     def TestJob_wait():
         account = Account(api_token=API_TOKEN)
         service = RuntimeService(account)
-        job = service.run(name='long-run-task', backend="py_simu", inputs="zxxx")
+        #job = service.run(name='long-run-task', backend="py_simu", inputs="zxxx")
+        #job = service.run(name='long-run-task', backend="py_simu")
+        #job = service.run(name='hello', backend="py_simu")
+        job = service.run(name='multi-task', backend="py_simu")
         print(job.job_id())
         print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         print(job.result(wait=True))
@@ -132,19 +141,21 @@ def callback(job_id, message):
 
 
 if __name__ == '__main__':
-    print(os.getcwd())
-    # TestAPI.TestRun()
-    # TestAPI.TestJob_wait()
-    # TestAPI.TestJob_nowait()
-    # TestAPI.parallelTest(num=5)
-    TestAPI.TestGetPrograms()
-    # TestAPI.TestGetProgram()
-    # TestAPI.TestUpload()
-    # TestAPI.TestUploadMore(10)
-    # TestAPI.TestUpdateProgram()
-    # TestAPI.TestDelProgram()
-    # job = TestAPI.TestRun()
-    # job.cancel()
-    # TestAPI.TestJob_wait()
-    # TestAPI.TestCheckSourceCode()
-    # TestAPI.TestWebsockets()
+    parser = argparse.ArgumentParser(description='Run different TestAPI methods based on arguments.')
+    parser.add_argument('--test', type=str, help='The name of the TestAPI static method to run (e.g., TestUpload, TestRun, etc.)')
+    parser.add_argument('--show-methods', action='store_true', help='Show available TestAPI methods')
+    args = parser.parse_args()
+
+    if args.show_methods:
+        print("Available TestAPI methods:")
+        for method_name in dir(TestAPI):
+            if method_name.startswith("Test") and callable(getattr(TestAPI, method_name)):
+                print(f" - {method_name}")
+    elif args.test:
+        test_method = getattr(TestAPI, args.test, None)
+        if test_method and callable(test_method):
+            test_method()
+        else:
+            print(f"Invalid test method: {args.test}")
+    else:
+        print("No test method provided. Use --test argument to specify the method to run.")
