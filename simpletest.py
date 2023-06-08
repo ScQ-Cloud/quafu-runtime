@@ -7,11 +7,7 @@ from quafu_runtime.clients.account import Account
 from quafu_runtime.job.job import RuntimeJob
 from quafu_runtime.quafu_runtime_service import RuntimeService
 
-API_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MTI3MiwiZXhwIjoxNjg1MTY0MjM1fQ.BuTKgSuvxjrZcgV8YmmkNScGvdQfrYbHphEMxI9n7p8"
-API_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MjcsImV4cCI6MTY4ODM1OTA4M30.lu2i_DFvu2HBb25u_aWTdaG7X4eoH51j1vfbYErx0_w"
-API_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTI2MywiZXhwIjoxNjg4ODgzNTQ2fQ.I32g0dsbHZ9MsTItTfjHDr-WPGBdaJKRg8hWAsnouwM"
-API_TOKEN = API_TOKEN[::-1]
-
+API_TOKEN = "MwuonsAWh8gRKJadBGPW-rDHjfTtITsM9ZHbsd0g23I.Qf2QTNzgDO4gjNxojIwhXZiwyM2ITM6ICZpJye.9JCVXpkI6ICc5RnIsIiN1IzUIJiOicGbhJye"
 
 class TestAPI:
     @staticmethod
