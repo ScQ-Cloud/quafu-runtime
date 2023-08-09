@@ -16,6 +16,12 @@ You can install this package using pip:
 pip install quafu-runtime
 ```
 
+Or you can build from source:
+
+```bash
+pip install .
+```
+
 
 
 ## Account Setup
@@ -83,24 +89,3 @@ This project is developed by the quantum cloud computing team at the Beijing Aca
 ## License
 
 [Apache License 2.0](https://github.com/Qiskit/qiskit-ibm-runtime/blob/main/LICENSE.txt).
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
