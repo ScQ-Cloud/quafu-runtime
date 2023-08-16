@@ -30,12 +30,12 @@ Quafu Runtime is part of Quafu Cloud, so you can just use Quafu Account. Firstly
 
 ```python
 from quafu_runtime import Account
-account = Account()
-account.save_apitoken("<your API token>")
+account = Account(api_token=<your quafu api token>)
+from quafu_runtime import RuntimeService
+service = RuntimeService(account=account)
 ```
 
 You only need to save your token once and no longer need to execute above code when you use quafu runtime after, except if you want to change your account.
-
 
 
 
@@ -45,12 +45,9 @@ Quafu Runtime provides interface to upload your program to the cloud and then ru
 
 ### Upload your programs
 ```python
-from quafu_runtime import RuntimeService
-service = RuntimeService()
 metadata = {"name": "multi-task"}
 program_id = service.upload_program(data='examples/program_source/multi-task.py', metadata=metadata)
 ```
-
 
 ### Finding your programs
 
@@ -63,8 +60,6 @@ service.list_programs()
 ### Executing your program
 
 ```python
-from quafu_runtime import RuntimeService
-service = RuntimeService()
 job = service.run(program_id = "<your program id>", params = "<parameters of program>")
 print(f"job ID: {job.job_id()}")
 ```
@@ -80,11 +75,9 @@ result = job.result(wait=True)
 The result is the data returned by your program.
 
 
-
 ## Document
 
 If you want to learn more features about Runtime, Please see the website [docs](https://scq-cloud.github.io/).
-
 
 
 ## Authors
