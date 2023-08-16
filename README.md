@@ -16,6 +16,12 @@ You can install this package using pip:
 pip install quafu-runtime
 ```
 
+Or you can build from source:
+
+```bash
+pip install .
+```
+
 
 
 ## Account Setup
@@ -24,12 +30,13 @@ Quafu Runtime is part of Quafu Cloud, so you can just use Quafu Account. Firstly
 
 ```python
 from quafu_runtime import Account
-account = Account()
-account.save_apitoken("<your API token>")
+from quafu_runtime import RuntimeService
+
+account = Account(api_token=<your quafu api token>)
+service = RuntimeService(account=account)
 ```
 
 You only need to save your token once and no longer need to execute above code when you use quafu runtime after, except if you want to change your account.
-
 
 
 
@@ -37,22 +44,24 @@ You only need to save your token once and no longer need to execute above code w
 
 Quafu Runtime provides interface to upload your program to the cloud and then run it, and you can get your program's output in many ways.
 
+### Upload your programs
+```python
+metadata = {"name": "multi-task"}
+program_id = service.upload_program(data='examples/program_source/multi-task.py', metadata=metadata)
+```
+
 ### Finding your programs
 
 List all available programs:
 
 ```python
-from quafu_runtime import RuntimeService
-service = RuntimeService()
 service.list_programs()
 ```
 
 ### Executing your program
 
 ```python
-from quafu_runtime import RuntimeService
-service = RuntimeService()
-job = service.run(program_id = "<your program id>",params = "<parameters of program>")
+job = service.run(program_id = "<your program id>", params = "<parameters of program>")
 print(f"job ID: {job.job_id()}")
 ```
 
@@ -67,11 +76,9 @@ result = job.result(wait=True)
 The result is the data returned by your program.
 
 
-
 ## Document
 
 If you want to learn more features about Runtime, Please see the website [docs](https://scq-cloud.github.io/).
-
 
 
 ## Authors
@@ -83,24 +90,3 @@ This project is developed by the quantum cloud computing team at the Beijing Aca
 ## License
 
 [Apache License 2.0](https://github.com/Qiskit/qiskit-ibm-runtime/blob/main/LICENSE.txt).
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
