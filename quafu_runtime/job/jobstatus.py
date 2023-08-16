@@ -3,6 +3,7 @@ import enum
 
 class JobStatus(enum.Enum):
     """Class for job status enumerated type."""
+
     QUEUED = "In queue"
     RUNNING = "Actively running"
     DONE = "Done"

@@ -46,7 +46,7 @@ Quafu Runtime provides interface to upload your program to the cloud and then ru
 
 ### Upload your programs
 ```python
-metadata = {"name": "multi-task"}
+metadata = {"name": "multi-task", "backend": "testbackend"}
 program_id = service.upload_program(data='examples/program_source/multi-task.py', metadata=metadata)
 ```
 

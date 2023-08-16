@@ -21,7 +21,7 @@ class RuntimeService:
         # get RuntimeService
         account = Account(api_token="testapitoken")
         service = RuntimeService(account)
-        
+
         # Upload program
         metadata = {"name": "long-run-task", "backend": "testbackend"}
         id1 = service.upload_program(data='/program/hello.py',metadata=metadata)
@@ -55,8 +55,7 @@ class RuntimeService:
     See more message about program templates in quafu_runtime.program.template
     """
 
-    def __init__(self,
-                 account: Account=None):
+    def __init__(self, account: Account = None):
         """QiskitRuntimeService constructor
 
         Args:
@@ -104,11 +103,7 @@ class RuntimeService:
                 print(f" -Name: {prog['name']}")
                 print(f" -Description: {prog['description']}")
 
-    def programs(
-            self,
-            refresh: bool = False,
-            limit: int = 10,
-            skip: int = 0):
+    def programs(self, refresh: bool = False, limit: int = 10, skip: int = 0):
         """
         Return available programs on server.
 
@@ -131,23 +126,31 @@ class RuntimeService:
                     limit=fetch_page_limit, skip=offset
                 )
                 if status == 201:
-                    raise CheckApiTokenError("API_TOKEN ERROR.", response['message']) from None
+                    raise CheckApiTokenError(
+                        "API_TOKEN ERROR.", response["message"]
+                    ) from None
                 elif status == 405:
                     raise ArgsException(
                         "Limit or offset is wrong or not provided."
                     ) from None
                 elif status != 200:
-                    raise UploadException(f"Failed to fetch programs: Unkown Error.") from None
+                    raise UploadException(
+                        f"Failed to fetch programs: Unkown Error."
+                    ) from None
 
-                response = response['data']
+                response = response["data"]
                 program_page = response.get("programs", [])
                 # count is the total number of programs that would be returned if
                 # there was no limit or skip
                 count = response.get("count", 0)
                 for prog_dict in program_page:
-                    program_id = prog_dict['program_id']
+                    program_id = prog_dict["program_id"]
                     self._programs[program_id] = prog_dict
-                if len(self._programs) == count or len(self._programs) >= limit + skip or len(program_page) < fetch_page_limit:
+                if (
+                    len(self._programs) == count
+                    or len(self._programs) >= limit + skip
+                    or len(program_page) < fetch_page_limit
+                ):
                     # Stop if there are no more programs returned by the server or
                     # if the number of cached programs is greater than the sum of limit and skip or
                     # if the server has no more page
@@ -159,12 +162,9 @@ class RuntimeService:
             return None
         if limit + skip > len(self._programs):
             return list(self._programs.values())[skip:]
-        return list(self._programs.values())[skip: limit + skip]
+        return list(self._programs.values())[skip : limit + skip]
 
-    def program(self,
-                refresh: bool = False,
-                name: str = None,
-                program_id: str = None):
+    def program(self, refresh: bool = False, name: str = None, program_id: str = None):
         """
         Return a program by id or name.
 
@@ -178,16 +178,14 @@ class RuntimeService:
         """
         # return result from cache
         if refresh is False:
-            if program_id in self._programs and 'data' in self._programs[program_id]:
+            if program_id in self._programs and "data" in self._programs[program_id]:
                 return self._programs[program_id]
 
         if name is None and program_id is None:
             raise ArgsException(f"name or program_id is a required field.")
-        status, response = self._client.program_get(
-            program_id=program_id, name=name
-        )
+        status, response = self._client.program_get(program_id=program_id, name=name)
         if status == 201:
-            raise CheckApiTokenError("API_TOKEN ERROR.", response['message']) from None
+            raise CheckApiTokenError("API_TOKEN ERROR.", response["message"]) from None
         if status == 403:
             raise NotAuthorizedException(
                 "You are not authorized to get program."
@@ -203,32 +201,30 @@ class RuntimeService:
         elif status != 200:
             raise UploadException(f"Failed to fetch program: Unkown Error.") from None
         program = RuntimeProgram(program_id=program_id)
-        response = response['data']
-        if 'data' in response:
-            response['data'] = from_base64_string(response['data']).decode("utf-8")
+        response = response["data"]
+        if "data" in response:
+            response["data"] = from_base64_string(response["data"]).decode("utf-8")
         program.update(response)
         if self._programs is None:
             self._programs = {}
         self._programs[program_id] = response
         return program
 
-    def upload_program(self,
-                       data: str,
-                       metadata: dict = None):
+    def upload_program(self, data: str, metadata: dict = None):
         """Upload a program to runtime server.
 
-            Args:
-                data: program str or the path of a program file(base64 encoded).
-                metadata: a dict or a file path.
-                     * name: Name of the program.
-                     * backend: Backend to run the circuits of the program.
-                     * group: Not used. Group the program shared.
-                     * description: Program description.
-                     * max_execution_time: Maximum execution time.
-                     * is_public: Whether the program should be public.
+        Args:
+            data: program str or the path of a program file(base64 encoded).
+            metadata: a dict or a file path.
+                 * name: Name of the program.
+                 * backend: Backend to run the circuits of the program.
+                 * group: Not used. Group the program shared.
+                 * description: Program description.
+                 * max_execution_time: Maximum execution time.
+                 * is_public: Whether the program should be public.
 
-            Return:
-                Program_id, if upload succeed.
+        Return:
+            Program_id, if upload succeed.
         """
         program_metadata = self._read_metadata(metadata)
         if "name" not in program_metadata or not program_metadata["name"]:
@@ -244,8 +240,8 @@ class RuntimeService:
             filename = data
         # Check the program before upload it!
         if filename is None:
-            filename = 'upload_temp.py'
-            file = open(filename, 'w')
+            filename = "upload_temp.py"
+            file = open(filename, "w")
             file.write(data)
             file.close()
         check(data, filename)
@@ -256,51 +252,51 @@ class RuntimeService:
             program_data=program_data, **program_metadata
         )
         if status_code == 201:
-            raise CheckApiTokenError("API_TOKEN ERROR.", response['message']) from None
+            raise CheckApiTokenError("API_TOKEN ERROR.", response["message"]) from None
         if status_code == 409:
             raise DuplicateProgramException(
                 "Program with the same name already exists."
             ) from None
         elif status_code == 406:
-            raise ArgsException(
-                "You have not provide enough args."
-            ) from None
+            raise ArgsException("You have not provide enough args.") from None
         elif status_code != 200:
             raise UploadException(f"Failed to upload program: Unkown Error.") from None
-        response = response['data']
+        response = response["data"]
         return response["id"]
 
     def update_program(
-            self,
-            program_id: str,
-            data: str = None,
-            description: str = None,
-            max_execution_time: int = None,
-            is_public: bool = None,
-            backend: str = None,
-            group: str = None,
-            metadata: dict = None
+        self,
+        program_id: str,
+        data: str = None,
+        description: str = None,
+        max_execution_time: int = None,
+        is_public: bool = None,
+        backend: str = None,
+        group: str = None,
+        metadata: dict = None,
     ):
         """Update a program.
 
-            Program metadata can be specified using the `metadata` parameter or
-            individual parameters, such as `description`. The individual parameter
-            takes precedence.
+        Program metadata can be specified using the `metadata` parameter or
+        individual parameters, such as `description`. The individual parameter
+        takes precedence.
 
-            Args:
-                program_id: Program ID.
-                data: Program data or path of the file containing program data to upload.
-                metadata: Name of the program metadata dictionary.
-                description: New program description.
-                max_execution_time: New maximum execution time.
-                is_public: Program set to public or not.
-                backend: Backend to run the circuits of the program.
-                group: Not used. Group the program shared.
+        Args:
+            program_id: Program ID.
+            data: Program data or path of the file containing program data to upload.
+            metadata: Name of the program metadata dictionary.
+            description: New program description.
+            max_execution_time: New maximum execution time.
+            is_public: Program set to public or not.
+            backend: Backend to run the circuits of the program.
+            group: Not used. Group the program shared.
 
-            Returns:
-                Program msg of the updated program.
+        Returns:
+            Program msg of the updated program.
         """
-        if not any([data, metadata, description, max_execution_time, is_public, backend, group]):
+        if not any(
+            [data, metadata, description, max_execution_time, is_public, backend, group]
+        ):
             warnings.warn(
                 "None of the 'data', 'metadata', 'name', 'description', "
                 "'max_execution_time', or 'spec' parameters is specified. "
@@ -316,8 +312,8 @@ class RuntimeService:
                 filename = data
             # Check the program before upload it!
             if filename is None:
-                filename = 'upload_temp.py'
-                file = open(filename, 'w')
+                filename = "upload_temp.py"
+                file = open(filename, "w")
                 file.write(data)
                 file.close()
             check(data, filename)
@@ -331,7 +327,7 @@ class RuntimeService:
             max_execution_time=max_execution_time,
             backend=backend,
             is_public=is_public,
-            group=group
+            group=group,
         )
         if not combined_metadata:
             warnings.warn(
@@ -345,17 +341,15 @@ class RuntimeService:
             program_id=program_id, program_data=data, **combined_metadata
         )
         if status_code == 201:
-            raise CheckApiTokenError("API_TOKEN ERROR.", response['message']) from None
+            raise CheckApiTokenError("API_TOKEN ERROR.", response["message"]) from None
         elif status_code == 404:
-            raise ProgramNotFoundException(
-                f"Program not found: {program_id}"
-            )from None
+            raise ProgramNotFoundException(f"Program not found: {program_id}") from None
         elif status_code != 200:
             raise UpdateException(f"Failed to update program: Unkown Error.") from None
-        response = response['data']
+        response = response["data"]
         program = RuntimeProgram(program_id=program_id)
-        if 'data' in response:
-            response['data'] = from_base64_string(response['data']).decode("utf-8")
+        if "data" in response:
+            response["data"] = from_base64_string(response["data"]).decode("utf-8")
         program.update(response)
         print("After update, the program is:\n", program)
         if self._programs is None:
@@ -366,16 +360,14 @@ class RuntimeService:
     def delete_program(self, program_id: str):
         """Delete a runtime program.
 
-            Args:
-                program_id: Program ID.
+        Args:
+            program_id: Program ID.
         """
         status_code, response = self._client.program_delete(program_id=program_id)
         if status_code == 201:
-            raise CheckApiTokenError("API_TOKEN ERROR.", response['message']) from None
+            raise CheckApiTokenError("API_TOKEN ERROR.", response["message"]) from None
         if status_code == 404:
-            raise ProgramNotFoundException(
-                f"Program not found: {program_id}"
-            ) from None
+            raise ProgramNotFoundException(f"Program not found: {program_id}") from None
         elif status_code != 200:
             raise UpdateException(f"Failed to delete program: Unkown Error.") from None
         if program_id in self._programs:
@@ -383,11 +375,13 @@ class RuntimeService:
         print(f"Program {program_id} deleted.")
         return
 
-    def run(self,
-            program_id: str = None,
-            name: str = None,
-            backend: str = None,
-            params: dict = None) -> RuntimeJob:
+    def run(
+        self,
+        program_id: str = None,
+        name: str = None,
+        backend: str = None,
+        params: dict = None,
+    ) -> RuntimeJob:
         """
         Run a program on the server.
 
@@ -412,22 +406,20 @@ class RuntimeService:
             params=params,
         )
         if status_code == 201:
-            raise CheckApiTokenError("API_TOKEN ERROR", response['message']) from None
+            raise CheckApiTokenError("API_TOKEN ERROR", response["message"]) from None
         elif status_code == 404:
             raise ProgramNotFoundException(
                 f"Program not found: {program_id}; Name:{name}"
             ) from None
         elif status_code == 401:
-            raise InputValueException(
-                f"params of run is invalid:{params}"
-            )from None
+            raise InputValueException(f"params of run is invalid:{params}") from None
         elif status_code == 405:
             raise ProgramNotValidException(
                 f"Program is invalid, please check it and update it"
-            )from None
+            ) from None
         elif status_code != 200:
             raise RunFailedException(f"Failed to run program: {program_id}") from None
-        response = response['data']
+        response = response["data"]
         if backend is None:
             backend = response["backend"]
         if program_id is None:
@@ -442,7 +434,7 @@ class RuntimeService:
             program_id=program_id,
             params=params,
         )
-        print(f'job created, job_id is {job.job_id()}')
+        print(f"job created, job_id is {job.job_id()}")
         return job
 
     def _read_metadata(self, metadata: str = None) -> dict:
@@ -458,8 +450,7 @@ class RuntimeService:
             metadata_keys = [
                 "name",
                 "backend",
-                "group"
-                "max_execution_time",
+                "group" "max_execution_time",
                 "description",
                 "is_public",
             ]
@@ -476,7 +467,14 @@ class RuntimeService:
         """
         merged = {}
         metadata = metadata or {}
-        metadata_keys = ["name", "max_execution_time", "description", "is_public", "backend", "group"]
+        metadata_keys = [
+            "name",
+            "max_execution_time",
+            "description",
+            "is_public",
+            "backend",
+            "group",
+        ]
         for key in metadata_keys:
             if kwargs.get(key, None) is not None:
                 merged[key] = kwargs[key]

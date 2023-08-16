@@ -11,8 +11,8 @@ class Account:
         _token:  Api_token that associate to your Quafu account. If not provided, load locally.
 
     """
-    def __init__(self,
-                 api_token: str = None):
+
+    def __init__(self, api_token: str = None):
         """Account constructor.
 
         Args:
@@ -29,8 +29,8 @@ class Account:
             # self._url_ws = "ws://192.168.220.55:8760"
             self._url = "http://119.3.224.187:5050/"
             self._url_ws = "ws://119.3.224.187:8760"
-    def save_api_token(self,
-                       api_token: str):
+
+    def save_api_token(self, api_token: str):
         """Save your api_token that associates your quafu account.
 
         Args:
@@ -55,7 +55,9 @@ class Account:
             self._token = data[0].strip("\n")
             # self._url = data[1].strip("\n")
         except Exception as e:
-            raise UserException(f"User configure error. Please set up your token. Error: {str(e)}")
+            raise UserException(
+                f"User configure error. Please set up your token. Error: {str(e)}"
+            )
 
     def get_url(self):
         """Get quafu http url."""

@@ -40,13 +40,14 @@ def format_exception(error: Exception) -> str:
 
 class RuntimeWebsocketClient(ABC):
     """Client for websocket communication with the IBM Quantum runtime service."""
+
     BACKOFF_MAX = 8
 
     def __init__(
-            self,
-            job_id: str,
-            account: Account,
-            message_queue: Optional[Queue] = None,
+        self,
+        job_id: str,
+        account: Account,
+        message_queue: Optional[Queue] = None,
     ) -> None:
         """WebsocketClient constructor.
 
@@ -59,7 +60,7 @@ class RuntimeWebsocketClient(ABC):
         self._access_token = account.get_token()
         self._job_id = job_id
         self._message_queue = message_queue
-        self._header = {'api_token': self._access_token, 'job_id': self._job_id}
+        self._header = {"api_token": self._access_token, "job_id": self._job_id}
         self._ws: Optional[WebSocketApp] = None
         self._authenticated = False
         self._cancelled = False
@@ -153,10 +154,10 @@ class RuntimeWebsocketClient(ABC):
         self._error = format_exception(error)
 
     def stream(
-            self,
-            url: str,
-            retries: int = 8,
-            backoff_factor: float = 0.5,
+        self,
+        url: str,
+        retries: int = 8,
+        backoff_factor: float = 0.5,
     ) -> Any:
         """Stream from the websocket.
 
@@ -187,17 +188,15 @@ class RuntimeWebsocketClient(ABC):
             )
             try:
                 self._reset_state()
-                self._ws.run_forever(
-                    ping_interval=60, ping_timeout=10
-                )
+                self._ws.run_forever(ping_interval=60, ping_timeout=10)
                 self.connected = False
 
                 # Handle path-specific errors
                 self._handle_stream_iteration()
 
                 if self._client_close_code in (
-                        WebsocketClientCloseCode.NORMAL,
-                        WebsocketClientCloseCode.CANCEL,
+                    WebsocketClientCloseCode.NORMAL,
+                    WebsocketClientCloseCode.CANCEL,
                 ):
                     # If we closed the connection with a normal code.
                     return self._last_message
@@ -264,10 +263,10 @@ class RuntimeWebsocketClient(ABC):
         return min(self.BACKOFF_MAX, backoff_time)
 
     def disconnect(
-            self,
-            close_code: Optional[
-                WebsocketClientCloseCode
-            ] = WebsocketClientCloseCode.NORMAL,
+        self,
+        close_code: Optional[
+            WebsocketClientCloseCode
+        ] = WebsocketClientCloseCode.NORMAL,
     ) -> None:
         """Close the websocket connection.
 

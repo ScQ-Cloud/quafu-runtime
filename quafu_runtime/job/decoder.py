@@ -33,4 +33,3 @@ class ResultDecoder:
             return json.loads(data, cls=json.JSONDecoder)
         except json.JSONDecodeError:
             return data
-

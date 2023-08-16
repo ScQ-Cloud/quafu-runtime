@@ -1,6 +1,7 @@
 import numpy as np
 from quafu import QuantumCircuit
 from quafu import simulate
+
 """Runtime program template.
 
 It takes a
@@ -17,7 +18,7 @@ def prepare_circuits():
     q.cnot(0, 1)
     measures = [0, 1]
     cbits = [0, 1]
-    q.measure(measures,  cbits=cbits)
+    q.measure(measures, cbits=cbits)
     return q
 
 
@@ -44,5 +45,5 @@ def run(task, userpub, params):
     return {
         "num": simu_res.num,
         "probabilities": simu_res.probabilities.tolist(),
-        "message": "final result"
+        "message": "final result",
     }

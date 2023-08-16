@@ -5,6 +5,7 @@ class UserPub:
 
     Usage: userpub.pulish(message)
     """
+
     def publish(self, message: bytes):
         """Publish message to client.
 
