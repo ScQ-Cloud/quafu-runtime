@@ -30,8 +30,9 @@ Quafu Runtime is part of Quafu Cloud, so you can just use Quafu Account. Firstly
 
 ```python
 from quafu_runtime import Account
-account = Account(api_token=<your quafu api token>)
 from quafu_runtime import RuntimeService
+
+account = Account(api_token=<your quafu api token>)
 service = RuntimeService(account=account)
 ```
 
