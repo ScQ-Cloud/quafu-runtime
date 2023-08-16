@@ -43,13 +43,20 @@ You only need to save your token once and no longer need to execute above code w
 
 Quafu Runtime provides interface to upload your program to the cloud and then run it, and you can get your program's output in many ways.
 
+### Upload your programs
+```python
+from quafu_runtime import RuntimeService
+service = RuntimeService()
+metadata = {"name": "multi-task"}
+program_id = service.upload_program(data='examples/program_source/multi-task.py', metadata=metadata)
+```
+
+
 ### Finding your programs
 
 List all available programs:
 
 ```python
-from quafu_runtime import RuntimeService
-service = RuntimeService()
 service.list_programs()
 ```
 
@@ -58,7 +65,7 @@ service.list_programs()
 ```python
 from quafu_runtime import RuntimeService
 service = RuntimeService()
-job = service.run(program_id = "<your program id>",params = "<parameters of program>")
+job = service.run(program_id = "<your program id>", params = "<parameters of program>")
 print(f"job ID: {job.job_id()}")
 ```
 
