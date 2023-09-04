@@ -48,13 +48,13 @@ class RuntimeJob:
     def __init__(
         self,
         job_id: str,
-        account: Account = None,
-        status: int = 0,
-        api_client: RuntimeClient = None,
-        backend: str = None,
-        creation_date: str = None,
-        program_id: str = None,
-        params: str = None,
+        account: Optional[Account] = None,
+        status: Optional[int] = 0,
+        api_client: Optional[RuntimeClient] = None,
+        backend: Optional[str] = None,
+        creation_date: Optional[str] = None,
+        program_id: Optional[str] = None,
+        params: Optional[str] = None,
     ):
         """Job constructor.
         If you want to retrieve a job instance in this way,

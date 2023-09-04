@@ -437,7 +437,7 @@ class RuntimeService:
         print(f"job created, job_id is {job.job_id()}")
         return job
 
-    def _read_metadata(self, metadata: str = None) -> dict:
+    def _read_metadata(self, metadata: Optional[str] = None) -> dict:
         """Read metadata.
 
         Args:
@@ -457,7 +457,7 @@ class RuntimeService:
             return {key: val for key, val in metadata.items() if key in metadata_keys}
         return {}
 
-    def _merge_metadata(self, metadata: dict = None, **kwargs: Any) -> dict:
+    def _merge_metadata(self, metadata: Optional[dict] = None, **kwargs: Any) -> dict:
         """Merge multiple copies of metadata.
         Args:
             metadata: Program metadata.

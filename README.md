@@ -1,7 +1,6 @@
 # Quafu Runtime Client
 
 
-
 Quafu is a Python toolkit for submitting quantum circuits on the superconducting quantum computing cloud [Quafu](http://quafu.baqis.ac.cn/).
 
 Quafu Runtime is new part of the Quantum Services on Quafu cloud. With Runtime, you can mix classical and quantum programs and send them to the cloud for execution, reducing the number of data transfers and execution time.
@@ -21,7 +20,6 @@ Or you can build from source:
 ```bash
 pip install .
 ```
-
 
 
 ## Account Setup
@@ -74,6 +72,20 @@ result = job.result(wait=True)
 ```
 
 The result is the data returned by your program.
+
+### Retrieve job
+
+You can also save your job id after submitting it using `service.run`, then you can sign off and get back later to retrieve your job results.
+
+First [create your account instance](#account-setup). Then simply create a job instance following:
+
+```python
+from quafu_runtime import RuntimeJob
+
+job = RuntimeJob("<job-id>", account=account)
+```
+
+Then you can get your job results using `job.result()`.
 
 
 ## Document
