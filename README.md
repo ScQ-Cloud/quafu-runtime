@@ -59,7 +59,7 @@ service.list_programs()
 ### Executing your program
 
 ```python
-job = service.run(program_id = "<your program id>", params = "<parameters of program>")
+job = service.run(program_id = "<your program id>", params = <parameters of program>)
 print(f"job ID: {job.job_id()}")
 ```
 

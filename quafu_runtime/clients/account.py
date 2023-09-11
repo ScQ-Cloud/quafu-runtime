@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 
 from ..rtexceptions.rtexceptions import UserException
 from ..utils.base import get_homedir
@@ -12,7 +13,7 @@ class Account:
 
     """
 
-    def __init__(self, api_token: str = None):
+    def __init__(self, api_token: Optional[str] = None):
         """Account constructor.
 
         Args:
