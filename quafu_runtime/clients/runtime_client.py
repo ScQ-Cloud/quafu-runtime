@@ -184,7 +184,12 @@ class RuntimeClient:
         res = self._session.get(url, headers=self.headers, params=payload)
         if res.status_code == 200:
             res = res.json()
-            return res["status"], res
+            # TODO(zhaoyilun): this is just a temperal fix
+            # unify return code as "code" in the future
+            try:
+                return res["status"], res
+            except KeyError:
+                return res["code"], res
         else:
             return res.status_code, None
 

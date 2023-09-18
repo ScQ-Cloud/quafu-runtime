@@ -125,7 +125,9 @@ class RuntimeService:
                 status, response = self._client.get_programs(
                     limit=fetch_page_limit, skip=offset
                 )
-                if status == 201:
+                # TODO(zhaoyilun): the backend code has changed to 400
+                # for api token error, unify this and put status codes in another file
+                if status == 201 or status == 400:
                     raise CheckApiTokenError(
                         "API_TOKEN ERROR.", response["message"]
                     ) from None
