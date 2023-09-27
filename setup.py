@@ -15,7 +15,8 @@ REQUIREMENTS = [
     "urllib3>=1.21.1",
     "websocket-client>=1.5.1",
     "typing-extensions>=4.0.0",
-    "pyflakes>=3.0.1"
+    "pyflakes>=3.0.1",
+    "Deprecated>=1.2.14"
 ]
 
 setuptools.setup(

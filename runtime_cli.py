@@ -1,8 +1,8 @@
 import sys
 import argparse
 import datetime
+from deprecated import deprecated
 from time import sleep
-from typing_extensions import deprecated
 from quafu_runtime.clients.account import Account
 from quafu_runtime.quafu_runtime_service import RuntimeService
 
@@ -14,7 +14,9 @@ class RuntimeAPI:
 
     @staticmethod
     def run_upload(args):
-        check_non_empty_args(program_name=args.program_name, program_path=args.program_path)
+        check_non_empty_args(
+            program_name=args.program_name, program_path=args.program_path
+        )
         account = Account(api_token=args.api_token)
         service = RuntimeService(account)
         metadata = {"name": args.program_name, "backend": "testbackend"}
@@ -22,6 +24,7 @@ class RuntimeAPI:
         print(f"program_id: {pid}")
 
     # TODO(zhaoyilun): refactor
+    @deprecated(reason="needs refine")
     @staticmethod
     def legacy_run_upload_more(num: int):
         account = Account(api_token=API_TOKEN)
@@ -40,6 +43,7 @@ class RuntimeAPI:
         service.list_programs(refresh=True, detailed=False, limit=20)
 
     # TODO(zhaoyilun): refine
+    @deprecated(reason="needs refine")
     @staticmethod
     def legacy_run_get_program():
         account = Account(api_token=API_TOKEN)
@@ -65,6 +69,7 @@ class RuntimeAPI:
         )
 
     # TODO(zhaoyilun): refine
+    @deprecated(reason="needs refine")
     @staticmethod
     def legacy_run_check_source_code():
         account = Account(api_token=API_TOKEN)
@@ -74,6 +79,7 @@ class RuntimeAPI:
             data="examples/program_source/program_with_error.py", metadata=metadata
         )
 
+    @deprecated(reason="needs refine")
     @staticmethod
     def legacy_run_del_program():
         account = Account(api_token=API_TOKEN)
@@ -81,6 +87,7 @@ class RuntimeAPI:
         service.delete_program(program_id="8ca38b518f1546c89e9dec112b997e4b")
 
     # TODO(zhaoyilun): refine
+    @deprecated(reason="needs refine")
     @staticmethod
     def legacy_run():
         account = Account(api_token=API_TOKEN)
@@ -90,6 +97,7 @@ class RuntimeAPI:
         print(result)
 
     # TODO(zhaoyilun): refine
+    @deprecated(reason="needs refine")
     @staticmethod
     def legacy_run_job_async():
         account = Account(api_token=API_TOKEN)
@@ -104,6 +112,7 @@ class RuntimeAPI:
         print(response)
 
     # TODO(zhaoyilun): refine
+    @deprecated(reason="needs refine")
     @staticmethod
     def legacy_run_parallel(num):
         import multiprocessing
@@ -134,6 +143,7 @@ class RuntimeAPI:
         print(job.logs())
 
     # TODO(zhaoyilun): needs refine
+    @deprecated(reason="needs refine")
     @staticmethod
     def legacy_run_websockets():
         account = Account(api_token=API_TOKEN)
