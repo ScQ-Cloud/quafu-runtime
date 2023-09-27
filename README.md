@@ -88,6 +88,45 @@ job = RuntimeJob("<job-id>", account=account)
 Then you can get your job results using `job.result()`.
 
 
+## Command line interface
+We also provide a cli tool for convenience.
+
+
+Show help info.
+```bash
+python runtime_cli.py -h
+```
+
+List available commands.
+```bash
+python runtime_cli.py --show-methods
+```
+
+Run a specific command.
+
+```bash
+python runtime_cli.py --run run_get_programs
+```
+
+Some commands require input additional params, to show required params, you could run:
+
+```bash
+python runtime_cli.py --run run_upload
+```
+
+The output should be like
+```
+program_name,program_path must be set!
+```
+
+Then you can use this command to upload a program
+```bash
+python runtime_cli.py --run run_upload --program-name "name-of-the-program" --program-path path/to/this/program
+```
+
+For other commands like `run_job_sync, run_update_program`, you can follow the same procedure to use them.
+
+
 ## Document
 
 If you want to learn more features about Runtime, Please see the website [docs](https://scq-cloud.github.io/).

@@ -91,4 +91,4 @@ def run(task: Task, userpub, params):
         energy = measure(params, shots, task)
         print(f'{i} iterations, energy: {energy:.10f}')
         energys.append(energy)
-    return energys, params
+    return energys, params.tolist()
