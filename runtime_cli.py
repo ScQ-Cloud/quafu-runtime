@@ -6,7 +6,7 @@ from time import sleep
 from quafu_runtime.clients.account import Account
 from quafu_runtime.quafu_runtime_service import RuntimeService
 
-API_TOKEN = "ENqgPTQ0OnS5hUhy0hlLwoDP_sPoNsj4jitGoJ7aUVX.9VzN0UzNwcTO2EjOiAHelJCL3ITM6ICZpJye.9JCVXpkI6ICc5RnIsIiN1IzUIJiOicGbhJye"
+API_TOKEN = "0NjkF0-LizJ8P09GIeHLL95_ShrXozyJff3RGhd5qw8.9RDNzQTMxADM3EjOiAHelJCL3ITM6ICZpJye.9JCVXpkI6ICc5RnIsIiN1IzUIJiOicGbhJye"
 
 
 class RuntimeAPI:
