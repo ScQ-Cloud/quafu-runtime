@@ -20,7 +20,7 @@ PYFLAKES_ERROR_MESSAGES = [
     messages.DefaultExceptNotLast,
     messages.TooManyExpressionsInStarredAssignment,
     messages.ImportStarNotPermitted,
-    messages.ImportStarUsed
+    messages.ImportStarUsed,
 ]
 
 

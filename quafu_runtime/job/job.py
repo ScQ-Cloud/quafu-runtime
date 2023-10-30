@@ -7,8 +7,14 @@ from ..clients.runtime_client import RuntimeClient
 from ..clients.runtime_client_ws import WebsocketClientCloseCode, RuntimeWebsocketClient
 from ..job.decoder import ResultDecoder
 from ..job.jobstatus import JOB_FINAL_STATES, JobStatus
-from ..rtexceptions.rtexceptions import ArgsException, JobNotFoundException, NotAuthorizedException, RunFailedException, \
-    RuntimeInvalidStateError, CheckApiTokenError
+from ..rtexceptions.rtexceptions import (
+    ArgsException,
+    JobNotFoundException,
+    NotAuthorizedException,
+    RunFailedException,
+    RuntimeInvalidStateError,
+    CheckApiTokenError,
+)
 from ..clients.account import Account
 
 logger = logging.getLogger(__name__)
@@ -39,16 +45,17 @@ class RuntimeJob:
 
     _executor = futures.ThreadPoolExecutor(thread_name_prefix="runtime_job")
 
-    def __init__(self,
-                 job_id: str,
-                 account: Account = None,
-                 status: int = 0,
-                 api_client: RuntimeClient = None,
-                 backend: str = None,
-                 creation_date: str = None,
-                 program_id: str = None,
-                 params: str = None,
-                 ):
+    def __init__(
+        self,
+        job_id: str,
+        account: Optional[Account] = None,
+        status: Optional[int] = 0,
+        api_client: Optional[RuntimeClient] = None,
+        backend: Optional[str] = None,
+        creation_date: Optional[str] = None,
+        program_id: Optional[str] = None,
+        params: Optional[str] = None,
+    ):
         """Job constructor.
         If you want to retrieve a job instance in this way,
         you should provide `job_id` and your `account` instance of Account.
@@ -71,11 +78,18 @@ class RuntimeJob:
         self._job_id = job_id
         self._client = api_client
         if self._client is None:
-            self._client = RuntimeClient(token=account.get_token(), url=account.get_url())
+            self._client = RuntimeClient(
+                token=account.get_token(), url=account.get_url()
+            )
         self.params = params
         self.backend = backend
-        self._status_map = {0: JobStatus.QUEUED, 1: JobStatus.RUNNING, 2: JobStatus.DONE, 3: JobStatus.CANCELLED,
-                            4: JobStatus.ERROR}
+        self._status_map = {
+            0: JobStatus.QUEUED,
+            1: JobStatus.RUNNING,
+            2: JobStatus.DONE,
+            3: JobStatus.CANCELLED,
+            4: JobStatus.ERROR,
+        }
         self._program_id = program_id
         self._creation_date = creation_date
         self._status = self._status_map[status]
@@ -95,8 +109,7 @@ class RuntimeJob:
             message_queue=self._result_queue,
         )
 
-    def result(self,
-               wait: bool):
+    def result(self, wait: bool):
         """Get the result from server.
 
         Args:
@@ -110,39 +123,34 @@ class RuntimeJob:
         job_id = self.job_id()
         if self._result is not None:
             return {
-                'result': self._result,
-                'finished_time': self._finish_time,
-                'status': self._status
+                "result": self._result,
+                "finished_time": self._finish_time,
+                "status": self._status,
             }
-        status_code, response = self._client.job_result(
-            job_id=job_id,
-            wait=wait
-        )
+        status_code, response = self._client.job_result(job_id=job_id, wait=wait)
         if status_code == 201:
             raise CheckApiTokenError("API_TOKEN ERROR.") from None
         if status_code == 404:
-            raise JobNotFoundException(
-                f"Job not found: {job_id}"
-            ) from None
+            raise JobNotFoundException(f"Job not found: {job_id}") from None
         elif status_code != 200:
             raise RunFailedException(f"Failed to get result: {job_id}") from None
-        response = response['data']
+        response = response["data"]
         # self._result = response[]
-        self._result = response['result']
-        self._status = self._status_map[response['status']]
-        self._finish_time = response['finish_time']
-        if response['status'] != 2:
-            del response['finish_time']
+        self._result = response["result"]
+        self._status = self._status_map[response["status"]]
+        self._finish_time = response["finish_time"]
+        if response["status"] != 2:
+            del response["finish_time"]
             self._finish_time = None
-        if response['status'] == 4:
-            self._error_msg = response['result']
-            response['error_msg'] = self._error_msg
-            del response['result']
-        response['status'] = self._status
+        if response["status"] == 4:
+            self._error_msg = response["result"]
+            response["error_msg"] = self._error_msg
+            del response["result"]
+        response["status"] = self._status
         return response
 
     def interim_results(
-            self, callback: Callable, decoder: Optional[Type[ResultDecoder]] = None
+        self, callback: Callable, decoder: Optional[Type[ResultDecoder]] = None
     ) -> None:
         """Start streaming interim job results.
 
@@ -169,10 +177,12 @@ class RuntimeJob:
         #     result_queue=self._result_queue,
         #     user_callback=callback,
         #     decoder=decoder,)
-        self._executor.submit(self._stream_results,
-                              result_queue=self._result_queue,
-                              user_callback=callback,
-                              decoder=decoder,)
+        self._executor.submit(
+            self._stream_results,
+            result_queue=self._result_queue,
+            user_callback=callback,
+            decoder=decoder,
+        )
 
     def _is_streaming(self) -> bool:
         """Return whether job results are being streamed.
@@ -208,10 +218,10 @@ class RuntimeJob:
         self._ws_client.disconnect(WebsocketClientCloseCode.CANCEL)
 
     def _stream_results(
-            self,
-            result_queue: queue.Queue,
-            user_callback: Callable,
-            decoder: Optional[Type[ResultDecoder]] = None,
+        self,
+        result_queue: queue.Queue,
+        user_callback: Callable,
+        decoder: Optional[Type[ResultDecoder]] = None,
     ) -> None:
         """Stream results.
 
@@ -268,19 +278,17 @@ class RuntimeJob:
         if status_code == 201:
             raise CheckApiTokenError("API_TOKEN ERROR.") from None
         if status_code == 404:
-            raise JobNotFoundException(
-                f"Job not found: {job_id}"
-            ) from None
+            raise JobNotFoundException(f"Job not found: {job_id}") from None
         elif status_code == 403:
             raise NotAuthorizedException(
                 f"You are not the owner of Job:{job_id}"
-            )from None
+            ) from None
         elif status_code != 200:
             raise RunFailedException(f"Failed to cancel job: {job_id}") from None
-        response = response['data']
-        if response['status'] != -1:
-            self._status = self._status_map[response['status']]
-            response['status'] = self._status
+        response = response["data"]
+        if response["status"] != -1:
+            self._status = self._status_map[response["status"]]
+            response["status"] = self._status
         else:
             print("Job cancel failed")
         self.interim_result_cancel()
@@ -298,19 +306,17 @@ class RuntimeJob:
         if status_code == 201:
             raise CheckApiTokenError("API_TOKEN ERROR.") from None
         if status_code == 404:
-            raise JobNotFoundException(
-                f"Job not found: {job_id}"
-            ) from None
+            raise JobNotFoundException(f"Job not found: {job_id}") from None
         elif status_code != 200:
             raise RunFailedException(f"Failed to get job: {job_id} status") from None
-        response = response['data']
-        self._status = self._status_map[response['status']]
-        self._result = response['result']
-        self._finish_time = response['finished_time']
+        response = response["data"]
+        self._status = self._status_map[response["status"]]
+        self._result = response["result"]
+        self._finish_time = response["finished_time"]
         if self._status == JobStatus.ERROR:
             self._error_msg = self._result
             self._result = None
-        if response['status'] < 2:
+        if response["status"] < 2:
             self._finish_time = None
         print(f"Job status: {self._status}")
         return self._status
@@ -328,16 +334,14 @@ class RuntimeJob:
         if status_code == 201:
             raise CheckApiTokenError("API_TOKEN ERROR.") from None
         if status_code == 404:
-            raise JobNotFoundException(
-                f"Job not found: {job_id}"
-            ) from None
+            raise JobNotFoundException(f"Job not found: {job_id}") from None
         elif status_code != 200:
             raise RunFailedException(f"Failed to get job: {job_id} logs") from None
-        response = response['data']
-        self._status = self._status_map[response['status']]
-        self._logs = response['logs']
+        response = response["data"]
+        self._status = self._status_map[response["status"]]
+        self._logs = response["logs"]
         print(f"Job status: {self._status}")
-        return response['logs']
+        return response["logs"]
 
     def delete(self) -> bool:
         """Delete the job.
@@ -353,20 +357,18 @@ class RuntimeJob:
         if status_code == 201:
             raise CheckApiTokenError("API_TOKEN ERROR.") from None
         if status_code == 404:
-            raise JobNotFoundException(
-                f"Job not found: {job_id}"
-            ) from None
+            raise JobNotFoundException(f"Job not found: {job_id}") from None
         elif status_code == 403:
             raise NotAuthorizedException(
                 f"You are not the owner of Job:{job_id}"
-            )from None
+            ) from None
         elif status_code != 200:
             raise RunFailedException(f"Failed to get job: {job_id} logs") from None
-        response = response['data']
-        self._status = self._status_map[response['status']]
-        deleted = response['deleted']
+        response = response["data"]
+        self._status = self._status_map[response["status"]]
+        deleted = response["deleted"]
         err = None
-        if response['status'] < 2:
+        if response["status"] < 2:
             err = "job is running"
         print(f"Job deleted: {deleted}, Error: {err}")
         return deleted

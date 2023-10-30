@@ -50,4 +50,5 @@ def run(task: Task, userpub, params):
 
 if __name__ == '__main__':
     task = Task()
+    task.runtime_job_id = "dafasdfa"
     run(task, None, "")

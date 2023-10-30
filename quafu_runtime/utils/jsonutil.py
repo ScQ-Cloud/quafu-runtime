@@ -18,6 +18,7 @@ def to_base64_string(data: str) -> str:
     """
     return base64.b64encode(data.encode("utf-8")).decode("utf-8")
 
+
 def from_base64_string(data: str) -> str:
     """Convert base64 string to string.
 
@@ -28,6 +29,7 @@ def from_base64_string(data: str) -> str:
         data as string
     """
     return base64.b64decode(data)
+
 
 def _serialize_and_encode(
     data: Any, serializer: Callable, compress: bool = True, **kwargs: Any
@@ -96,6 +98,3 @@ def _deserialize_from_settings(mod_name: str, class_name: str, settings: Dict) -
         if name == class_name:
             return clz(**settings)
     raise ValueError(f"Unable to find class {class_name} in module {mod_name}")
-
-
-

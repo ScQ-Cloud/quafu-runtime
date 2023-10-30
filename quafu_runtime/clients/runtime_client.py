@@ -6,10 +6,7 @@ import requests
 class RuntimeClient:
     """Class for accessing Quafu runtime server."""
 
-    def __init__(self,
-                 token: str,
-                 url: str
-                 ):
+    def __init__(self, token: str, url: str):
         """RuntimeClient constructor
 
         Args:
@@ -19,17 +16,21 @@ class RuntimeClient:
         self._token = token
         self._url = url + "/runtime"
         self._session = requests.session()
-        self.headers = {'Content-Type': 'application/json;charset=UTF-8', 'api_token': self._token}
+        self.headers = {
+            "Content-Type": "application/json;charset=UTF-8",
+            "api_token": self._token,
+        }
 
-    def program_upload(self,
-                       program_data: str,
-                       name: str,
-                       backend: str,
-                       group: str = None,
-                       max_execution_time: Optional[int] = None,
-                       description: Optional[str] = None,
-                       is_public: bool = False,
-                       ):
+    def program_upload(
+        self,
+        program_data: str,
+        name: str,
+        backend: str,
+        group: str = None,
+        max_execution_time: Optional[int] = None,
+        description: Optional[str] = None,
+        is_public: bool = False,
+    ):
         """Upload a new program.
 
         Args:
@@ -58,20 +59,20 @@ class RuntimeClient:
         res = self._session.post(url, headers=self.headers, data=data)
         if res.status_code == 200:
             res = res.json()
-            return res['status'], res
+            return res["status"], res
         else:
             return res.status_code, None
 
     def program_update(
-            self,
-            program_id: str,
-            program_data: str = None,
-            name: str = None,
-            description: str = None,
-            max_execution_time: int = None,
-            is_public: bool = None,
-            backend: str = None,
-            group: str = None
+        self,
+        program_id: str,
+        program_data: str = None,
+        name: str = None,
+        description: str = None,
+        max_execution_time: int = None,
+        is_public: bool = None,
+        backend: str = None,
+        group: str = None,
     ):
         """Update an existed program.
 
@@ -102,7 +103,7 @@ class RuntimeClient:
             if max_execution_time:
                 payload["cost"] = max_execution_time
             if is_public:
-                payload["is_public"] = 1 if is_public is True else 0,
+                payload["is_public"] = (1 if is_public is True else 0,)
             if group:
                 payload["group"] = group
             if backend:
@@ -112,7 +113,7 @@ class RuntimeClient:
         res = self._session.post(url, headers=self.headers, data=data)
         if res.status_code == 200:
             res = res.json()
-            return res['status'], res
+            return res["status"], res
         else:
             return res.status_code, None
 
@@ -126,18 +127,22 @@ class RuntimeClient:
             'success' if delete program successfully.
         """
         url = self.get_url("program_delete")
-        res = self._session.delete(url, headers=self.headers, params={'program_id': program_id})
+        res = self._session.delete(
+            url, headers=self.headers, params={"program_id": program_id}
+        )
         if res.status_code == 200:
             res = res.json()
-            return res['status'], res
+            return res["status"], res
         else:
             return res.status_code, None
 
-    def program_run(self,
-                    program_id: str = None,
-                    name: str = None,
-                    backend: str = None,
-                    params: dict = None):
+    def program_run(
+        self,
+        program_id: str = None,
+        name: str = None,
+        backend: str = None,
+        params: dict = None,
+    ):
         """Run a program on the runtime server.
 
         Args:
@@ -151,19 +156,16 @@ class RuntimeClient:
 
         """
         url = self.get_url("programs_run_deploy")
-        payload = {
-            "program_id": program_id,
-            "program_name": name
-        }
+        payload = {"program_id": program_id, "program_name": name}
         if backend is not None:
-            payload['backend'] = backend
+            payload["backend"] = backend
         if params is not None:
-            payload['params'] = params
+            payload["params"] = params
         data = json.dumps(payload)
         res = self._session.post(url, headers=self.headers, data=data)
         if res.status_code == 200:
             res = res.json()
-            return res['status'], res
+            return res["status"], res
         else:
             return res.status_code, None
 
@@ -178,20 +180,20 @@ class RuntimeClient:
             A list of metadata of runtime programs.
         """
         url = self.get_url("programs")
-        payload = {
-            "limit": limit,
-            "offset": skip
-        }
+        payload = {"limit": limit, "offset": skip}
         res = self._session.get(url, headers=self.headers, params=payload)
         if res.status_code == 200:
             res = res.json()
-            return res['status'], res
+            # TODO(zhaoyilun): this is just a temperal fix
+            # unify return code as "code" in the future
+            try:
+                return res["status"], res
+            except KeyError:
+                return res["code"], res
         else:
             return res.status_code, None
 
-    def program_get(self,
-                    program_id: str = None,
-                    name: str = None):
+    def program_get(self, program_id: str = None, name: str = None):
         """Get an existed program.
         Args:
             program_id: Program ID.
@@ -201,25 +203,19 @@ class RuntimeClient:
             Program's all msg.
         """
         url = self.get_url("program")
-        payload = {
-            "program_id": program_id,
-            "name": name
-        }
+        payload = {"program_id": program_id, "name": name}
         res = self._session.get(url, headers=self.headers, params=payload)
         if res.status_code == 200:
             res = res.json()
-            return res['status'], res
+            return res["status"], res
         else:
             return res.status_code, None
 
     def program_validate(self):
-        """Before upload to server, check the program.
-        """
+        """Before upload to server, check the program."""
         pass
 
-    def job_result(self,
-                   job_id: str,
-                   wait: bool = False):
+    def job_result(self, job_id: str, wait: bool = False):
         """Try to get result of a job.
 
         Args:
@@ -240,12 +236,11 @@ class RuntimeClient:
         res = self._session.post(url, headers=self.headers, data=data)
         if res.status_code == 200:
             res = res.json()
-            return res['status'], res
+            return res["status"], res
         else:
             return res.status_code, None
 
-    def job_result_nowait(self,
-                          job_id: str):
+    def job_result_nowait(self, job_id: str):
         """Try to get result.
 
         Args:
@@ -262,7 +257,7 @@ class RuntimeClient:
         res = self._session.post(url, headers=self.headers, data=data)
         if res.status_code == 200:
             res = res.json()
-            return res['status'], res
+            return res["status"], res
         else:
             return res.status_code, None
 
@@ -283,7 +278,7 @@ class RuntimeClient:
         res = self._session.post(url, headers=self.headers, data=data)
         if res.status_code == 200:
             res = res.json()
-            return res['status'], res
+            return res["status"], res
         else:
             return res.status_code, None
 
@@ -303,7 +298,7 @@ class RuntimeClient:
         res = self._session.get(url, headers=self.headers, params=payload)
         if res.status_code == 200:
             res = res.json()
-            return res['status'], res
+            return res["status"], res
         else:
             return res.status_code, None
 
@@ -323,7 +318,7 @@ class RuntimeClient:
         res = self._session.get(url, headers=self.headers, params=payload)
         if res.status_code == 200:
             res = res.json()
-            return res['status'], res
+            return res["status"], res
         else:
             return res.status_code, None
 
@@ -343,7 +338,7 @@ class RuntimeClient:
         res = self._session.get(url, headers=self.headers, params=payload)
         if res.status_code == 200:
             res = res.json()
-            return res['status'], res
+            return res["status"], res
         else:
             return res.status_code, None
 
@@ -356,6 +351,6 @@ class RuntimeClient:
         Returns:
             The resolved URL of the endpoint (relative to the session base URL).
         """
-        #if '_wait' in identifier:
+        # if '_wait' in identifier:
         #    return self._socket_url
         return "{}{}{}".format(self._url, "/", identifier)
