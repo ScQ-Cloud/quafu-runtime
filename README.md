@@ -1,3 +1,5 @@
+> This package is still in a beta stage. For API token, please register this http://120.46.209.71/ website instead of the [official website](https://quafu.baqis.ac.cn/). Please file an [issue](https://github.com/ScQ-Cloud/quafu-runtime/issues) if you met any problems. 
+
 # Quafu Runtime Client
 
 
